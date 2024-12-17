@@ -17,15 +17,15 @@ class Config(object):
     if not SECRET_KEY:
         SECRET_KEY = ''.join(random.choice( string.ascii_lowercase  ) for i in range( 32 ))
 
-    # Social AUTH context
-    SOCIAL_AUTH_GITHUB  = False
+    # # Social AUTH context
+    # SOCIAL_AUTH_GITHUB  = False
 
-    GITHUB_ID      = os.getenv('GITHUB_ID'    , None)
-    GITHUB_SECRET  = os.getenv('GITHUB_SECRET', None)
+    # GITHUB_ID      = os.getenv('GITHUB_ID'    , None)
+    # GITHUB_SECRET  = os.getenv('GITHUB_SECRET', None)
 
-    # Enable/Disable Github Social Login    
-    if GITHUB_ID and GITHUB_SECRET:
-         SOCIAL_AUTH_GITHUB  = True        
+    # # Enable/Disable Github Social Login    
+    # if GITHUB_ID and GITHUB_SECRET:
+    #      SOCIAL_AUTH_GITHUB  = True        
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -36,7 +36,7 @@ class Config(object):
     DB_PORT     = os.getenv('DB_PORT'     , None)
     DB_NAME     = os.getenv('DB_NAME'     , None)
 
-    USE_SQLITE  = True 
+    USE_SQLITE  = False #True 
 
     # try to set up a Relational DBMS
     if DB_ENGINE and DB_NAME and DB_USERNAME:
@@ -60,10 +60,10 @@ class Config(object):
             print('> Error: DBMS Exception: ' + str(e) )
             print('> Fallback to SQLite ')    
 
-    if USE_SQLITE:
+    # if USE_SQLITE:
 
-        # This will create a file in <app> FOLDER
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
+    #     # This will create a file in <app> FOLDER
+    #     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'db.sqlite3')
     
 class ProductionConfig(Config):
     DEBUG = False

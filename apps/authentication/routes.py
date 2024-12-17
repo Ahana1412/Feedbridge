@@ -16,7 +16,7 @@ from apps.authentication import blueprint
 from apps.authentication.forms import LoginForm, CreateAccountForm
 from apps.authentication.models import Users
 
-from apps.authentication.util import verify_pass
+from apps.authentication.util import verify_pass, role_required
 
 @blueprint.route('/')
 def route_default():
@@ -24,99 +24,171 @@ def route_default():
 
 # Login & Registration
 
-@blueprint.route("/github")
-def login_github():
-    """ Github login """
-    if not github.authorized:
-        return redirect(url_for("github.login"))
+# @blueprint.route("/github")
+# def login_github():
+#     """ Github login """
+#     if not github.authorized:
+#         return redirect(url_for("github.login"))
 
-    res = github.get("/user")
-    return redirect(url_for('home_blueprint.index'))
+#     res = github.get("/user")
+#     return redirect(url_for('home_blueprint.index'))
+
+# @blueprint.route('/login', methods=['GET', 'POST'])
+# def login():
+#     login_form = LoginForm(request.form)
+#     if 'login' in request.form:
+
+#         # read form data
+#         user_id  = request.form['username'] # we can have here username OR email
+#         password = request.form['password']
+
+#         # Locate user
+#         user = Users.find_by_username(user_id)
+
+#         # if user not found
+#         if not user:
+
+#             user = Users.find_by_email(user_id)
+
+#             if not user:
+#                 return render_template( 'accounts/login.html',
+#                                         msg='Unknown User or Email',
+#                                         form=login_form)
+
+#         # Check the password
+#         if verify_pass(password, user.password):
+
+#             login_user(user)
+#             return redirect(url_for('authentication_blueprint.route_default'))
+
+#         # Something (user or pass) is not ok
+#         return render_template('accounts/login.html',
+#                                msg='Wrong user or password',
+#                                form=login_form)
+
+#     if not current_user.is_authenticated:
+#         return render_template('accounts/login.html',
+#                                form=login_form)
+#     return redirect(url_for('home_blueprint.index'))
+
+
+# @blueprint.route('/register', methods=['GET', 'POST'])
+# def register():
+#     create_account_form = CreateAccountForm(request.form)
+#     if 'register' in request.form:
+
+#         username = request.form['username']
+#         email = request.form['email']
+
+#         # Check usename exists
+#         user = Users.query.filter_by(username=username).first()
+#         if user:
+#             return render_template('accounts/register.html',
+#                                    msg='Username already registered',
+#                                    success=False,
+#                                    form=create_account_form)
+
+#         # Check email exists
+#         user = Users.query.filter_by(email=email).first()
+#         if user:
+#             return render_template('accounts/register.html',
+#                                    msg='Email already registered',
+#                                    success=False,
+#                                    form=create_account_form)
+
+#         # else we can create the user
+#         user = Users(**request.form)
+#         db.session.add(user)
+#         db.session.commit()
+
+#         # Delete user from session
+#         logout_user()
+
+#         return render_template('accounts/register.html',
+#                                msg='User created successfully.',
+#                                success=True,
+#                                form=create_account_form)
+
+#     else:
+#         return render_template('accounts/register.html', form=create_account_form)
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def login():
     login_form = LoginForm(request.form)
     if 'login' in request.form:
-
-        # read form data
-        user_id  = request.form['username'] # we can have here username OR email
+        user_id = request.form['username']
         password = request.form['password']
 
-        # Locate user
-        user = Users.find_by_username(user_id)
-
-        # if user not found
-        if not user:
-
-            user = Users.find_by_email(user_id)
-
-            if not user:
-                return render_template( 'accounts/login.html',
-                                        msg='Unknown User or Email',
-                                        form=login_form)
-
-        # Check the password
-        if verify_pass(password, user.password):
-
+        user = Users.find_by_username(user_id) or Users.find_by_email(user_id)
+        if user and verify_pass(password, user.password):
             login_user(user)
-            return redirect(url_for('authentication_blueprint.route_default'))
 
-        # Something (user or pass) is not ok
-        return render_template('accounts/login.html',
-                               msg='Wrong user or password',
-                               form=login_form)
+            # Redirect based on role
+            if user.role == 'donor':
+                return redirect(url_for('donor_blueprint.donor_profile')) #make common home later
+            elif user.role == 'food_bank':
+                return redirect(url_for('food_bank_blueprint.food_bank_profile'))
+            elif user.role == 'volunteer':
+                return redirect(url_for('volunteer_blueprint.volunteer_profile'))
+            elif user.role == 'admin':
+                return redirect(url_for('admin_blueprint.admin_manage_orders'))
+        
+        return render_template('accounts/login.html', msg='Wrong user or password', form=login_form)
 
-    if not current_user.is_authenticated:
-        return render_template('accounts/login.html',
-                               form=login_form)
-    return redirect(url_for('home_blueprint.index'))
+    return render_template('accounts/login.html', form=login_form)
 
 
 @blueprint.route('/register', methods=['GET', 'POST'])
 def register():
     create_account_form = CreateAccountForm(request.form)
     if 'register' in request.form:
-
         username = request.form['username']
         email = request.form['email']
+        role = request.form['role']  # Get the selected role
 
-        # Check usename exists
-        user = Users.query.filter_by(username=username).first()
-        if user:
+        # Check username exists
+        if Users.query.filter_by(username=username).first():
             return render_template('accounts/register.html',
                                    msg='Username already registered',
                                    success=False,
                                    form=create_account_form)
 
         # Check email exists
-        user = Users.query.filter_by(email=email).first()
-        if user:
+        if Users.query.filter_by(email=email).first():
             return render_template('accounts/register.html',
                                    msg='Email already registered',
                                    success=False,
                                    form=create_account_form)
 
-        # else we can create the user
-        user = Users(**request.form)
+        # Create the user
+        user = Users(username=username, email=email, password=request.form['password'], role=role)
         db.session.add(user)
         db.session.commit()
 
-        # Delete user from session
         logout_user()
-
         return render_template('accounts/register.html',
                                msg='User created successfully.',
                                success=True,
                                form=create_account_form)
 
-    else:
-        return render_template('accounts/register.html', form=create_account_form)
+    return render_template('accounts/register.html', form=create_account_form)
 
 
 @blueprint.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('authentication_blueprint.login')) 
+
+@blueprint.route('/food_bank_page')
+@role_required('food_bank')
+def food_bank_page():
+    return render_template('food_bank/food_bank_page.html')
+
+@blueprint.route('/donor_page')
+@role_required('donor')
+def donor_page():
+    return render_template('donor/donor_page.html')
+
 
 # Errors
 
