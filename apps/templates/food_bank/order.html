@@ -8,6 +8,16 @@
 {% block content %}
 
 <!-- [ Main Content ] start -->
+<div class="row">
+    <div class="col-sm-12">
+        <label for="sort-option">Sort By:</label>
+        <select id="sort-option" class="form-control" onchange="sortTable()">
+            <option value="quantity">Quantity</option>
+            <option value="distance">Distance</option>
+        </select>
+    </div>
+</div>
+
 <div class="pcoded-main-container">
     <div class="pcoded-wrapper">
         <div class="pcoded-content">
@@ -44,7 +54,6 @@
                                             <table class="table table-striped">
                                                 <thead>
                                                     <tr>
-                                                        <th>#</th>
                                                         <th>Restaurant/Grocery Name</th>
                                                         <th>Quantity Available</th>
                                                         <th>Food Type</th>

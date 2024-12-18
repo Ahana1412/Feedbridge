@@ -1,47 +1,43 @@
-from flask import Flask, render_template
-import mysql.connector
+from flask import Blueprint, render_template, request, redirect, url_for
+from .models import FoodItem, Order, Chat
 
-app = Flask(__name__)
+foodbank_bp = Blueprint('foodbank', __name__)
 
-# Database connection configuration
-db_config = {
-    'user': 'your_username',
-    'password': 'your_password',
-    'host': 'localhost',
-    'database': 'your_database'
-}
+@foodbank_bp.route('/foodbank/home')
+def home():
+    food_items = FoodItem.query.all()
+    return render_template('foodbank/home.html', food_items=food_items)
 
-@app.route('/foodbank')
-def foodbank():
-    # Connect to the database
-    connection = mysql.connector.connect(**db_config)
-    cursor = connection.cursor(dictionary=True)
+@foodbank_bp.route('/foodbank/order', methods=['GET', 'POST'])
+def order():
+    if request.method == 'POST':
+        # Logic to place an order
+        pass
+    return render_template('foodbank/order.html')
 
-    # Query to fetch donor data
-    query = """
-        SELECT d.name, d.address, d.contact, f.quantity, f.food_type
-        FROM donor d
-        JOIN food f ON d.donor_id = f.donor_id
-    """
-    cursor.execute(query)
-    donors = cursor.fetchall()
+@foodbank_bp.route('/foodbank/chatbot', methods=['GET', 'POST'])
+def chatbot():
+    if request.method == 'POST':
+        # Chatbot logic here
+        pass
+    return render_template('foodbank/chatbot.html')
 
-    cursor.close()
-    connection.close()
+@foodbank_bp.route('/foodbank/history')
+def history():
+    # Fetch past orders
+    pass
 
-    return render_template('foodbank.html', donors=donors)
-@app.route('/order.html')
-def order_page():
-    return render_template('order.html')
+@foodbank_bp.route('/foodbank/profile')
+def profile():
+    # Fetch and update foodbank profile
+    pass
 
-@app.route('/chatbot.html')
-def chatbot_page():
-    return render_template('chatbot.html')
-
-@app.route('/history.html')
-def history_page():
-    return render_template('history.html')
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
+def get_donors():
+    sort_by = request.args.get('sort_by', 'quantity')  # Default to quantity if not provided
+    if sort_by == 'quantity':
+        donors = Donor.query.order_by(Donor.quantity.desc()).all()
+    elif sort_by == 'distance':
+        donors = Donor.query.order_by(Donor.distance).all()  # Assuming distance is calculated in your database
+    else:
+        donors = Donor.query.all()
+    return donors
