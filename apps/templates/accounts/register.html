@@ -15,7 +15,7 @@
             <div class="card">
                 <div class="card-body text-center">
 
-                    <h3 class="mb-4">Sign UP</h3>
+                    <h3 class="mb-4">Sign Up</h3>
 
                     <span class="mb-2 text-muted">
                         {% if msg %}
@@ -30,44 +30,73 @@
 
                     <!-- Hide the form on success -->
                     {% if success %}
-                        <a href="{{ url_for('authentication_blueprint.login') }}" class="btn btn-primary shadow-2 mb-4">Sign IN</a>
+                        <a href="{{ url_for('authentication_blueprint.login') }}" class="btn btn-primary shadow-2 mb-4">Sign In</a>
                     {% else %}
-
                         <form role="form" method="post" action="">
 
-                            {{ form.hidden_tag() }}                    
-
+                            {{ form.hidden_tag() }}
+                        
+                            <!-- Generic Fields -->
                             <div class="input-group mb-3">
                                 {{ form.username(placeholder="Username", class="form-control") }}
                             </div>
-                            
                             <div class="input-group mb-3">
                                 {{ form.email(placeholder="Email", class="input form-control", type="email") }}
                             </div>
-
-                            <div class="input-group mb-4">
+                            <div class="input-group mb-3">
                                 {{ form.password(placeholder="Password", class="form-control", type="password") }}
                             </div>
-                            
+                            <div class="input-group mb-3">
+                                {{ form.contact_number(placeholder="Contact Number", class="form-control") }}
+                            </div>
+                            <div class="input-group mb-3">
+                                {{ form.address(placeholder="Address", class="form-control") }}
+                            </div>
+                            <div class="input-group mb-3">
+                                {{ form.role(placeholder="Role", class="form-control", id="role_selector") }}
+                            </div>
+                        
+                            <!-- Role-Specific Fields -->
+                            <!-- Donor Fields -->
+                            <div id="donor_fields" style="display: none;">
+                                <div class="input-group mb-3">
+                                    {{ form.donor_name(placeholder="Restaurant or Grocery Store Name", class="form-control") }}
+                                </div>
+                                <div class="input-group mb-4">
+                                    {{ form.donor_type(class="form-control") }}
+                                </div>
+                            </div>
+                        
+                            <!-- Food Bank Fields -->
+                            <div id="food_bank_fields" style="display: none;">
+                                <div class="input-group mb-3">
+                                    {{ form.foodbank_name(placeholder="Food Bank or NGO Name", class="form-control") }}
+                                </div>
+                            </div>
+                        
+                            <!-- Volunteer Fields -->
+                            <div id="volunteer_fields" style="display: none;">
+                                <div class="input-group mb-3">
+                                    {{ form.first_name(placeholder="Volunteer First Name", class="form-control") }}
+                                </div>
+                                <div class="input-group mb-3">
+                                    {{ form.last_name(placeholder="Volunteer Last Name", class="form-control") }}
+                                </div>
+                                <div class="input-group mb-3">
+                                    {{ form.preferred_location(placeholder="Preferred Location", class="form-control") }}
+                                </div>
+                                <div class="input-group mb-4">
+                                    {{ form.availability(class="form-control") }}
+                                </div>
+                            </div>
+                        
                             <button type="submit" name="register" class="btn btn-primary shadow-2 mb-4">Register</button>
-
+                        
                         </form>
+                    
                         
                         <p class="mb-0 text-muted">Already have an account? <a href="{{ url_for('authentication_blueprint.login') }}">Login</a></p>
-                       
 
-                    {% endif %}
-                    
-                    {% if not success and config.SOCIAL_AUTH_GITHUB %}
-                        <div class="mx-2">
-
-                            <a href="{{url_for('authentication_blueprint.login_github')}}" class="btn">
-                                <i class="feather icon-github auth-icon"></i>
-                                
-                            </a>
-                            <br />
-                            <span class="mx-2">Sign UP with GitHub</span>
-                        </div>
                     {% endif %}
 
                 </div>
@@ -76,3 +105,7 @@
     </div>
 
 {% endblock content %}
+
+{% block javascripts %}
+    <script src="{{ url_for('static', filename='assets/js/pages/register.js') }}"></script>
+{% endblock javascripts %}

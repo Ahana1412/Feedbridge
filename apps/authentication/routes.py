@@ -3,18 +3,19 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 
-from flask import render_template, redirect, request, url_for
+from flask import render_template, redirect, request, url_for, flash
 from flask_login import (
     current_user,
     login_user,
     logout_user
 )
-from flask_dance.contrib.github import github
+# from flask_dance.contrib.github import github
+
 
 from apps import db, login_manager
 from apps.authentication import blueprint
 from apps.authentication.forms import LoginForm, CreateAccountForm
-from apps.authentication.models import Users
+from apps.authentication.models import Users, Donor, FoodBank, Volunteer
 
 from apps.authentication.util import verify_pass, role_required
 
@@ -24,93 +25,6 @@ def route_default():
 
 # Login & Registration
 
-# @blueprint.route("/github")
-# def login_github():
-#     """ Github login """
-#     if not github.authorized:
-#         return redirect(url_for("github.login"))
-
-#     res = github.get("/user")
-#     return redirect(url_for('home_blueprint.index'))
-
-# @blueprint.route('/login', methods=['GET', 'POST'])
-# def login():
-#     login_form = LoginForm(request.form)
-#     if 'login' in request.form:
-
-#         # read form data
-#         user_id  = request.form['username'] # we can have here username OR email
-#         password = request.form['password']
-
-#         # Locate user
-#         user = Users.find_by_username(user_id)
-
-#         # if user not found
-#         if not user:
-
-#             user = Users.find_by_email(user_id)
-
-#             if not user:
-#                 return render_template( 'accounts/login.html',
-#                                         msg='Unknown User or Email',
-#                                         form=login_form)
-
-#         # Check the password
-#         if verify_pass(password, user.password):
-
-#             login_user(user)
-#             return redirect(url_for('authentication_blueprint.route_default'))
-
-#         # Something (user or pass) is not ok
-#         return render_template('accounts/login.html',
-#                                msg='Wrong user or password',
-#                                form=login_form)
-
-#     if not current_user.is_authenticated:
-#         return render_template('accounts/login.html',
-#                                form=login_form)
-#     return redirect(url_for('home_blueprint.index'))
-
-
-# @blueprint.route('/register', methods=['GET', 'POST'])
-# def register():
-#     create_account_form = CreateAccountForm(request.form)
-#     if 'register' in request.form:
-
-#         username = request.form['username']
-#         email = request.form['email']
-
-#         # Check usename exists
-#         user = Users.query.filter_by(username=username).first()
-#         if user:
-#             return render_template('accounts/register.html',
-#                                    msg='Username already registered',
-#                                    success=False,
-#                                    form=create_account_form)
-
-#         # Check email exists
-#         user = Users.query.filter_by(email=email).first()
-#         if user:
-#             return render_template('accounts/register.html',
-#                                    msg='Email already registered',
-#                                    success=False,
-#                                    form=create_account_form)
-
-#         # else we can create the user
-#         user = Users(**request.form)
-#         db.session.add(user)
-#         db.session.commit()
-
-#         # Delete user from session
-#         logout_user()
-
-#         return render_template('accounts/register.html',
-#                                msg='User created successfully.',
-#                                success=True,
-#                                form=create_account_form)
-
-#     else:
-#         return render_template('accounts/register.html', form=create_account_form)
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def login():
@@ -137,37 +51,91 @@ def login():
 
     return render_template('accounts/login.html', form=login_form)
 
-
 @blueprint.route('/register', methods=['GET', 'POST'])
 def register():
     create_account_form = CreateAccountForm(request.form)
+
     if 'register' in request.form:
+        # if not create_account_form.validate():  # Check if the form is valid
+        #     return render_template('accounts/register.html',
+        #                            msg='Please fill out all required fields correctly.',
+        #                            success=False,
+        #                            form=create_account_form)
+
+        # Common fields for all roles
         username = request.form['username']
         email = request.form['email']
-        role = request.form['role']  # Get the selected role
+        password = request.form['password']
+        role = request.form['role']
 
-        # Check username exists
+        # Check if username or email already exists
         if Users.query.filter_by(username=username).first():
             return render_template('accounts/register.html',
-                                   msg='Username already registered',
+                                   msg='Username already registered.',
                                    success=False,
                                    form=create_account_form)
 
-        # Check email exists
         if Users.query.filter_by(email=email).first():
             return render_template('accounts/register.html',
-                                   msg='Email already registered',
+                                   msg='Email already registered.',
                                    success=False,
                                    form=create_account_form)
 
-        # Create the user
-        user = Users(username=username, email=email, password=request.form['password'], role=role)
+        # Insert into Users table
+        user = Users(username=username, email=email, password=password, role=role)
         db.session.add(user)
+        db.session.flush()  # Get the user's ID for foreign key relationships
+        user_id = user.id
+
+        # Role-specific logic
+        if role == 'donor':
+            name = request.form.get('donor_name')
+            donor_type = request.form.get('donor_type')
+            contact_number = request.form.get('contact_number')
+            address = request.form.get('address')
+
+            if not name or not donor_type:
+                return render_template('accounts/register.html',
+                                       msg='Please fill out all donor-specific fields.',
+                                       success=False,
+                                       form=create_account_form)
+            donor = Donor(user_id=user_id, name=name, donor_type=donor_type, contact_number=contact_number, address=address)
+            db.session.add(donor)
+
+        elif role == 'food_bank':
+            name = request.form.get('foodbank_name')
+            contact_number = request.form.get('contact_number')
+            address = request.form.get('address')
+            if not name:
+                return render_template('accounts/register.html',
+                                       msg='Please fill out all food bank-specific fields.',
+                                       success=False,
+                                       form=create_account_form)
+            food_bank = FoodBank(user_id=user_id, name=name, contact_number=contact_number, address=address)
+            db.session.add(food_bank)
+
+        elif role == 'volunteer':
+            first_name = request.form.get('first_name')
+            last_name = request.form.get('last_name')
+            preferred_location = request.form.get('preferred_location')
+            availability = request.form.get('availability')
+            contact_number = request.form.get('contact_number')
+            address = request.form.get('address')
+            if not first_name or not last_name:
+                return render_template('accounts/register.html',
+                                       msg='Please fill out all volunteer-specific fields.',
+                                       success=False,
+                                       form=create_account_form)
+            volunteer = Volunteer(user_id=user_id, first_name=first_name, last_name=last_name,
+                                  preferred_location=preferred_location, availability=availability, contact_number=contact_number, address=address)
+            db.session.add(volunteer)
+
+        # Commit all changes to the database
         db.session.commit()
 
         logout_user()
         return render_template('accounts/register.html',
-                               msg='User created successfully.',
+                               msg='User registered successfully!',
                                success=True,
                                form=create_account_form)
 

@@ -8,35 +8,18 @@ from flask_login import UserMixin
 from sqlalchemy.orm import relationship
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from sqlalchemy.dialects.mysql import ENUM
-
+from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 from apps import db, login_manager
-
 from apps.authentication.util import hash_pass
+from sqlalchemy.exc import SQLAlchemyError
 
-# class Users(db.Model, UserMixin):
 
-#     __tablename__ = 'users'
+class InvalidUsage(Exception):
+    def __init__(self, message, status_code=None):
+        super().__init__(message)
+        self.status_code = status_code
 
-#     id            = db.Column(db.Integer, primary_key=True)
-#     username      = db.Column(db.String(64), unique=True)
-#     email         = db.Column(db.String(64), unique=True)
-#     password      = db.Column(db.LargeBinary)
-
-#     oauth_github  = db.Column(db.String(100), nullable=True)
-
-#     def __init__(self, **kwargs):
-#         for property, value in kwargs.items():
-#             # depending on whether value is an iterable or not, we must
-#             # unpack it's value (when **kwargs is request.form, some values
-#             # will be a 1-element list)
-#             if hasattr(value, '__iter__') and not isinstance(value, str):
-#                 # the ,= unpack of a singleton fails PEP8 (travis flake8 test)
-#                 value = value[0]
-
-#             if property == 'password':
-#                 value = hash_pass(value)  # we need bytes here (not plain str)
-
-#             setattr(self, property, value)
 
 class Users(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -98,6 +81,181 @@ class Users(db.Model, UserMixin):
             raise InvalidUsage(error, 422)
         return
 
+
+class Donor(db.Model):
+    __tablename__ = 'donor'
+    donor_id = db.Column('DonorID', db.Integer, primary_key=True)
+    user_id = db.Column('UserID', db.Integer, db.ForeignKey('users.id'), nullable=False)
+    name = db.Column('Name', db.String(100), nullable=False)
+    donor_type = db.Column('DonorType', db.Enum('Individual', 'Restaurant', 'Grocery Store', 'Others'), nullable=False)
+    contact_number = db.Column('ContactNo', db.String(15), nullable=False)
+    address = db.Column('Address', db.Text, nullable=False)
+
+    user = db.relationship('Users', backref='donor', lazy=True) # to access email use - donor.user.email 
+
+    def save(self) -> None:
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            db.session.close()
+            error = str(e.__dict__['orig'])
+            raise InvalidUsage(error, 422)
+        
+    def delete_from_db(self) -> None:
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            db.session.close()
+            error = str(e.__dict__['orig'])
+            raise InvalidUsage(error, 422)
+        return
+
+
+class FoodBank(db.Model):
+    __tablename__ = 'foodbank'
+    foodbank_id = db.Column('FoodBankID', db.Integer, primary_key=True)
+    user_id = db.Column('UserID', db.Integer, db.ForeignKey('users.id'), nullable=False)
+    name = db.Column('Name', db.String(100), nullable=False)
+    address = db.Column('Address', db.Text, nullable=False)
+    contact_number = db.Column('ContactNo', db.String(15), nullable=False)
+
+    user = db.relationship('Users', backref='foodbank', lazy=True) 
+
+    def save(self) -> None:
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            db.session.close()
+            error = str(e.__dict__['orig'])
+            raise InvalidUsage(error, 422)
+        
+    def delete_from_db(self) -> None:
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            db.session.close()
+            error = str(e.__dict__['orig'])
+            raise InvalidUsage(error, 422)
+        return
+
+
+class Volunteer(db.Model):
+    __tablename__ = 'volunteer'
+    volunteer_id = db.Column('VolunteerID', db.Integer, primary_key=True)
+    user_id = db.Column('UserID', db.Integer, db.ForeignKey('users.id'), nullable=False)
+    first_name = db.Column('FirstName', db.String(50), nullable=False)
+    last_name = db.Column('LastName', db.String(50), nullable=False)
+    contact_number = db.Column('ContactNo', db.String(15), nullable=False)
+    preferred_location = db.Column('PreferredLocation', db.String(100), nullable=True)
+    availability = db.Column(db.Enum('Weekdays', 'Weekends', 'Full-Time', 'Part-Time'), nullable=False)
+    address = db.Column('Address', db.Text, nullable=False)
+
+    user = db.relationship('Users', backref='volunteers', lazy=True)
+
+    def save(self) -> None:
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            db.session.close()
+            error = str(e.__dict__['orig'])
+            raise InvalidUsage(error, 422)
+        
+    def delete_from_db(self) -> None:
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            db.session.close()
+            error = str(e.__dict__['orig'])
+            raise InvalidUsage(error, 422)
+        return
+
+
+class Food(db.Model):
+    __tablename__ = 'food'
+    food_id = db.Column('FoodID', db.Integer, primary_key=True)
+    donor_id = db.Column('DonorID', db.Integer, db.ForeignKey('donor.donor_id'), nullable=False)
+    name = db.Column('Name', db.String(100), nullable=False)  
+    description = db.Column('Description', db.String(255), nullable=True) 
+    quantity = db.Column('Quantity', db.Integer)
+    donation_date = db.Column('DonationDate', db.Date, nullable=False)
+    expiry_date = db.Column('ExpiryDate', db.Date, nullable=False)
+    remaining_shelf_life = db.Column('RemainingShelfLife', db.Integer, nullable=False)  # Will be auto-calculated in MySQL
+    food_type = db.Column('FoodType', db.Enum('Veg', 'Non-Veg'), nullable=False)
+    item_type = db.Column('ItemType', db.Enum('Ready-to-Eat', 'Grocery'), nullable=False)
+    perishability = db.Column('Perishability', db.Enum('Perishable', 'Non-Perishable'), nullable=False)
+
+    def save(self) -> None:
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            db.session.close()
+            error = str(e.__dict__['orig'])
+            raise InvalidUsage(error, 422)
+
+    def delete_from_db(self) -> None:
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            db.session.close()
+            error = str(e.__dict__['orig'])
+            raise InvalidUsage(error, 422)
+        return
+    
+    # Relationship with Donor (optional)
+    # donor = db.relationship('Donor', backref='food', lazy=True)
+
+
+class Order(db.Model):
+    __tablename__ = 'orders'
+
+    order_id = db.Column('OrderID', db.Integer, primary_key=True)
+    food_id = db.Column('FoodID', db.Integer, db.ForeignKey('food.FoodID'), nullable=False)
+    foodbank_id = db.Column('FoodBankID', db.Integer, db.ForeignKey('foodbank.FoodBankID'), nullable=False)
+    request_date = db.Column('RequestDate', db.Date, nullable=False)
+    status = db.Column('Status', db.Enum('Pending', 'Approved', 'Rejected', 'Completed'), nullable=False)
+
+    def save(self) -> None:
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            db.session.close()
+            error = str(e.__dict__['orig'])
+            raise InvalidUsage(error, 422)
+        
+    def delete_from_db(self) -> None:
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            db.session.close()
+            error = str(e.__dict__['orig'])
+            raise InvalidUsage(error, 422)
+        return
+
+    # Optional Relationship fields
+    # food = db.relationship('Food', backref='orders', lazy=True)
+    # foodbank = db.relationship('FoodBank', backref='orders', lazy=True)
+
+
 @login_manager.user_loader
 def user_loader(id):
     return Users.query.filter_by(id=id).first()
@@ -107,7 +265,3 @@ def request_loader(request):
     username = request.form.get('username')
     user = Users.query.filter_by(username=username).first()
     return user if user else None
-
-# class OAuth(OAuthConsumerMixin, db.Model):
-#     user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="cascade"), nullable=False)
-#     user = db.relationship(Users)
