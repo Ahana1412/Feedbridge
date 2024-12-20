@@ -39,7 +39,7 @@ def login():
 
             # Redirect based on role
             if user.role == 'donor':
-                return redirect(url_for('donor_blueprint.donor_profile')) #make common home later
+                return redirect(url_for('home_blueprint.home_page')) #make common home later
             elif user.role == 'food_bank':
                 return redirect(url_for('food_bank_blueprint.food_bank_profile'))
             elif user.role == 'volunteer':
