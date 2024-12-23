@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Page Blank {% endblock %} 
+{% block title %} New Donation {% endblock %} 
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -10,25 +10,9 @@
     <!-- [ Main Content ] start -->
     <div class="pcoded-main-container">
         <div class="pcoded-wrapper">
+
             <div class="pcoded-content">
                 <div class="pcoded-inner-content">
-                    <!-- [ breadcrumb ] start -->
-                    <div class="page-header">
-                        <div class="page-block">
-                            <div class="row align-items-center">
-                                <div class="col-md-12">
-                                    <div class="page-header-title">
-                                        <h5 class="m-b-10">Sample Page</h5>
-                                    </div>
-                                    <ul class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
-                                        <li class="breadcrumb-item"><a href="javascript:">Sample Page</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- [ breadcrumb ] end -->
                     <div class="main-body">
                         <div class="page-wrapper">
                             <!-- [ Main Content ] start -->
@@ -36,12 +20,49 @@
                                 <div class="col-sm-12">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h5>Hello card</h5>
+                                            <h5>Fill in the donation details</h5>
                                         </div>
-                                        <div class="card-block">
-                                            <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                                            </p>
-                                        </div>
+                                        <form role="form" method="post" action="">
+                                            <div class="card-block">
+                                                <div class="row">
+                                                    <div class="col-sm-6 mb-4">
+                                                        <div class="input-group mb-3">
+                                                            {{ form.food_name.label }}  
+                                                            {{ form.food_name(placeholder="Name", class="form-control") }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6 mb-4">
+                                                        <div class="input-group mb-3">
+                                                            {{ form.quantity(placeholder="Quantity", class="form-control") }}
+                                                        </div>
+                                                    </div>                                                
+                                                    <div class="col-sm-6 mb-4">
+                                                        <div class="input-group mb-3">
+                                                            {{ form.item_type(placeholder="Item Type", class="form-control") }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6 mb-4">
+                                                        <div class="input-group mb-3">
+                                                            {{ form.food_type(placeholder="Food Type", class="form-control") }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6 mb-4">
+                                                        <div class="input-group mb-3">
+                                                            {{ form.expiry_date(placeholder="Expiry Date", class="form-control") }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 mb-4">
+                                                        <div class="input-group mb-3">
+                                                            {{ form.food_description(placeholder="Description", class="form-control") }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-12 mb-2">
+                                                        <button type="submit" name="new_donation" class="btn btn-primary shadow-2 mb-4">Submit</button>
+                                                    </div>                                                
+                                                </div>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -50,6 +71,7 @@
                     </div>
                 </div>
             </div>
+            
         </div>
     </div>
     <!-- [ Main Content ] end -->

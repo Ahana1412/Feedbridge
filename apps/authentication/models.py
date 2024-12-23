@@ -155,7 +155,7 @@ class Volunteer(db.Model):
     last_name = db.Column('LastName', db.String(50), nullable=False)
     contact_number = db.Column('ContactNo', db.String(15), nullable=False)
     preferred_location = db.Column('PreferredLocation', db.String(100), nullable=True)
-    availability = db.Column(db.Enum('Weekdays', 'Weekends', 'Full-Time', 'Part-Time'), nullable=False)
+    availability = db.Column(db.Enum('Weekdays', 'Weekends', 'FullTime', 'PartTime'), nullable=False)
     address = db.Column('Address', db.Text, nullable=False)
 
     user = db.relationship('Users', backref='volunteers', lazy=True)
@@ -192,9 +192,8 @@ class Food(db.Model):
     donation_date = db.Column('DonationDate', db.Date, nullable=False)
     expiry_date = db.Column('ExpiryDate', db.Date, nullable=False)
     remaining_shelf_life = db.Column('RemainingShelfLife', db.Integer, nullable=False)  # Will be auto-calculated in MySQL
-    food_type = db.Column('FoodType', db.Enum('Veg', 'Non-Veg'), nullable=False)
-    item_type = db.Column('ItemType', db.Enum('Ready-to-Eat', 'Grocery'), nullable=False)
-    perishability = db.Column('Perishability', db.Enum('Perishable', 'Non-Perishable'), nullable=False)
+    food_type = db.Column('FoodType', db.Enum('Veg', 'NonVeg'), nullable=False)
+    item_type = db.Column('ItemType', db.Enum('Cooked', 'Grocery'), nullable=False)
 
     def save(self) -> None:
         try:

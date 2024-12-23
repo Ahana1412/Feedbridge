@@ -65,8 +65,8 @@ class CreateAccountForm(FlaskForm):
                                     ('', 'Please select'),
                                     ('Weekdays', 'Weekdays'),
                                     ('Weekends', 'Weekends'),
-                                    ('Full-Time', 'Full-Time'),
-                                    ('Part-Time', 'Part-Time')
+                                    ('FullTime', 'Full-Time'),
+                                    ('PartTime', 'Part-Time')
                                 ],
                                 validators=[Optional()])
 
