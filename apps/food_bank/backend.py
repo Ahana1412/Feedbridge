@@ -2,20 +2,55 @@ from flask import render_template, request, jsonify
 from sqlalchemy import asc, desc
 import requests
 
-@app.route('/food-bank', methods=['GET'])
-def food_bank():
-    sort_option = request.args.get('sort', 'quantity')  # Default sort by quantity
-    donors = get_available_food_items()
+import pymysql
+import os
+from dotenv import load_dotenv
 
-    # Sorting logic
-    if sort_option == 'distance':
-        user_location = (user_lat, user_lng)  # Replace with actual user's lat/lng
-        donors = calculate_distances(donors, user_location)
-        donors = sorted(donors, key=lambda x: x['distance'])
-    elif sort_option == 'quantity':
-        donors = sorted(donors, key=lambda x: x['quantity'], reverse=True)
+# Load environment variables from the .env file
+load_dotenv()
+# Fetch credentials from the environment file
+DB_HOST = os.getenv('DB_HOST')
+DB_USER = os.getenv('DB_USER')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_NAME = os.getenv('DB_NAME')
 
-    return render_template('food_bank.html', donors=donors)
+def get_db_connection():
+    """Establishes a connection to the database."""
+    return pymysql.connect(
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        database=DB_NAME,
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
+def fetch_food_items():
+    """
+    Fetches available food items and their details from the database.
+    """
+    query = """
+        SELECT 
+            food.Name AS food_name,
+            food.Quantity,
+            food.FoodType,
+            food.ItemType,
+            food.ExpiryDate,
+            donor.Name AS donor_name,
+            donor.Address AS donor_address,
+            donor.ContactNo AS donor_contact
+        FROM food
+        JOIN donor ON food.DonorID = donor.DonorID
+    """
+    
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            result = cursor.fetchall()
+        return result
+    finally:
+        connection.close()
+
 
 def get_available_food_items():
     # Query the database for available food items
@@ -27,7 +62,7 @@ def get_available_food_items():
     return db.execute(query).fetchall()
 
 def calculate_distances(donors, user_location):
-    api_key = "YOUR_API_KEY"
+    api_key = "your api key"
     origins = f"{user_location[0]},{user_location[1]}"
     destinations = "|".join([donor['Address'] for donor in donors])
 
