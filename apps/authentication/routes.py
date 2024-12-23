@@ -38,14 +38,14 @@ def login():
             login_user(user)
 
             # Redirect based on role
-            if user.role == 'donor':
-                return redirect(url_for('donor_blueprint.donor_profile')) #make common home later
-            elif user.role == 'food_bank':
+            if user.role == 'donor' or 'food_bank' or 'volunteer' or 'admin':
+                return redirect(url_for('home_blueprint.home_page')) #make common home later
+            '''elif user.role == 'food_bank':
                 return redirect(url_for('food_bank_blueprint.food_bank_profile'))
             elif user.role == 'volunteer':
                 return redirect(url_for('volunteer_blueprint.volunteer_profile'))
             elif user.role == 'admin':
-                return redirect(url_for('admin_blueprint.admin_manage_orders'))
+                return redirect(url_for('admin_blueprint.admin_manage_orders'))'''
         
         return render_template('accounts/login.html', msg='Wrong user or password', form=login_form)
 

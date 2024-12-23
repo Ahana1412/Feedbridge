@@ -1,4 +1,5 @@
 <!-- [ navigation menu ] start -->
+
 <nav class="pcoded-navbar">
     <div class="navbar-wrapper">
         <div class="navbar-brand header-logo">
@@ -15,38 +16,78 @@
                 <li class="nav-item pcoded-menu-caption">
                     <label>Navigation</label>
                 </li>
-                <li data-username="Home" class="nav-item {% if 'index' in segment %} active {% endif %}">
-                    <a href="/" class="nav-link">
+
+                <!-- Home Link -->
+                <li class="nav-item {% if 'home' in segment %} active {% endif %}">
+                    <a href="{{ url_for('home_blueprint.home_page') }}" class="nav-link">
                         <span class="pcoded-micon"><i class="feather icon-home"></i></span>
                         <span class="pcoded-mtext">Home</span>
                     </a>
                 </li>
-                <li data-username="Profile Page" class="nav-item {% if 'profile' in segment %} active {% endif %}">
-                    <a href="/profile.html" class="nav-link">
+
+                <!-- Profile Link (Common for all roles) -->
+                <li class="nav-item {% if 'profile' in segment %} active {% endif %}">
+                    <a href="../home/" class="nav-link">
                         <span class="pcoded-micon"><i class="feather icon-user"></i></span>
                         <span class="pcoded-mtext">Profile</span>
                     </a>
                 </li>
-                <li data-username="Order" class="nav-item {% if 'order' in segment %} active {% endif %}">
-                    <a href="/order.html" class="nav-link">
-                        <span class="pcoded-micon"><i class="feather icon-shopping-cart"></i></span>
-                        <span class="pcoded-mtext">Order</span>
-                    </a>
-                </li>
-                <li data-username="Chatbot" class="nav-item {% if 'chatbot' in segment %} active {% endif %}">
-                    <a href="/chatbot.html" class="nav-link">
+
+                <!-- Role-based Links -->
+                {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'donor' %}
+                        <li class="nav-item {% if 'donate' in segment %} active {% endif %}">
+                            <a href="{{ url_for('donor_blueprint.donor_profile') }}" class="nav-link">
+                                <span class="pcoded-micon"><i class="feather icon-heart"></i></span>
+                                <span class="pcoded-mtext">Donate</span>
+                            </a>
+                        </li>
+                    {% elif current_user.role == 'food_bank' %}
+                        <li class="nav-item {% if 'order' in segment %} active {% endif %}">
+                            <a href="{{ url_for('food_bank_blueprint.food_bank_requests') }}" class="nav-link">
+
+                                <span class="pcoded-micon"><i class="feather icon-shopping-cart"></i></span>
+                                <span class="pcoded-mtext">Order</span>
+                            </a>
+                        </li>
+                    {% elif current_user.role == 'volunteer' %}
+                        <li class="nav-item {% if 'volunteer' in segment %} active {% endif %}">
+                            <a href="{{ url_for('volunteer.volunteer_schedule') }}" class="nav-link">
+                                <span class="pcoded-micon"><i class="feather icon-users"></i></span>
+                                <span class="pcoded-mtext">Volunteer</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+
+                <!-- Chatbot Link (Common for all roles) -->
+                <li class="nav-item {% if 'chatbot' in segment %} active {% endif %}">
+                    <a href="{{ url_for('home_blueprint.home_page') }}" class="nav-link">
                         <span class="pcoded-micon"><i class="feather icon-message-circle"></i></span>
                         <span class="pcoded-mtext">Chatbot</span>
                     </a>
                 </li>
-                <li data-username="History" class="nav-item {% if 'history' in segment %} active {% endif %}">
-                    <a href="/history.html" class="nav-link">
+
+                <!-- History Link (Common for all roles) -->
+                <li class="nav-item {% if 'history' in segment %} active {% endif %}">
+                    <a href="{{ url_for('home_blueprint.home_page') }}" class="nav-link">
                         <span class="pcoded-micon"><i class="feather icon-clock"></i></span>
                         <span class="pcoded-mtext">History</span>
                     </a>
                 </li>
+
+                <!-- Logout Link (Visible only when user is logged in) -->
+                {% if current_user.is_authenticated %}
+                <li class="nav-item">
+                    <a href="{{ url_for('authentication_blueprint.logout') }}" class="nav-link">
+                        <span class="pcoded-micon"><i class="feather icon-log-out"></i></span>
+                        <span class="pcoded-mtext">Logout</span>
+                    </a>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </div>
 </nav>
+
 <!-- [ navigation menu ] end -->
