@@ -1,0 +1,63 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Order History {% endblock %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="page-header">
+                    <h5>Your Order History</h5>
+                </div>
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-block">
+                                        {% if orders %}
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Order ID</th>
+                                                        <th>Food Name</th>
+                                                        <th>Description</th>
+                                                        <th>Request Date</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for order in orders %}
+                                                    <tr>
+                                                        <td>{{ order.OrderID }}</td>
+                                                        <td>{{ order.FoodName }}</td>
+                                                        <td>{{ order.Description }}</td>
+                                                        <td>{{ order.RequestDate }}</td>
+                                                        <td>{{ order.Status }}</td>
+                                                        <td>
+                                                            {% if order.Status != 'Received' %}
+                                                                <a href="{{ url_for('food_bank_blueprint.change_status', order_id=order.OrderID) }}" class="btn btn-primary">Mark as Received</a>
+                                                            {% else %}
+                                                                <span class="text-success">Received</span>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        {% else %}
+                                            <p>No orders placed yet.</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
