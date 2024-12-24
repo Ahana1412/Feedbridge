@@ -87,7 +87,7 @@ class Donor(db.Model):
     donor_id = db.Column('DonorID', db.Integer, primary_key=True)
     user_id = db.Column('UserID', db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column('Name', db.String(100), nullable=False)
-    donor_type = db.Column('DonorType', db.Enum('Individual', 'Restaurant', 'Grocery Store', 'Others'), nullable=False)
+    donor_type = db.Column('DonorType', db.Enum('Individual', 'Restaurant', 'GroceryStore', 'Others'), nullable=False)
     contact_number = db.Column('ContactNo', db.String(15), nullable=False)
     address = db.Column('Address', db.Text, nullable=False)
 
@@ -185,15 +185,21 @@ class Volunteer(db.Model):
 class Food(db.Model):
     __tablename__ = 'food'
     food_id = db.Column('FoodID', db.Integer, primary_key=True)
-    donor_id = db.Column('DonorID', db.Integer, db.ForeignKey('donor.donor_id'), nullable=False)
-    name = db.Column('Name', db.String(100), nullable=False)  
-    description = db.Column('Description', db.String(255), nullable=True) 
+    donor_id = db.Column('DonorID', db.Integer, db.ForeignKey('donor.DonorID'), nullable=False)
+    food_name = db.Column('Name', db.String(100), nullable=False)  
+    food_description = db.Column('Description', db.String(255), nullable=True) 
     quantity = db.Column('Quantity', db.Integer)
     donation_date = db.Column('DonationDate', db.Date, nullable=False)
     expiry_date = db.Column('ExpiryDate', db.Date, nullable=False)
-    remaining_shelf_life = db.Column('RemainingShelfLife', db.Integer, nullable=False)  # Will be auto-calculated in MySQL
+    # remaining_shelf_life = db.Column('RemainingShelfLife', db.Integer, nullable=True)  # Will be auto-calculated in MySQL
     food_type = db.Column('FoodType', db.Enum('Veg', 'NonVeg'), nullable=False)
     item_type = db.Column('ItemType', db.Enum('Cooked', 'Grocery'), nullable=False)
+    status = db.Column('Status', db.Enum('Available', 'Ordered'), nullable=False)  # Will be auto-calculated in MySQL
+
+    # RemainingShelfLife is automatically calculated in the database.
+    __mapper_args__ = {
+        "exclude_properties": ["RemainingShelfLife"]
+    }
 
     def save(self) -> None:
         try:
@@ -227,7 +233,7 @@ class Order(db.Model):
     food_id = db.Column('FoodID', db.Integer, db.ForeignKey('food.FoodID'), nullable=False)
     foodbank_id = db.Column('FoodBankID', db.Integer, db.ForeignKey('foodbank.FoodBankID'), nullable=False)
     request_date = db.Column('RequestDate', db.Date, nullable=False)
-    status = db.Column('Status', db.Enum('Pending', 'Approved', 'Rejected', 'Completed'), nullable=False)
+    status = db.Column('Status', db.Enum('Pending', 'VolunteerAssigned', 'Completed'), nullable=False)
 
     def save(self) -> None:
         try:
