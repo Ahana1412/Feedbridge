@@ -9,7 +9,7 @@
 {% block content %}
 
 <!-- [ Main Content ] start -->
-<div class="row">
+<div class="row" style="margin-left: 20%; width: 80%;"> <!-- Adjusted to avoid left-most corner -->
     <div class="col-sm-12">
         <!-- Sort By Dropdown -->
         <label for="sort-option">Sort By:</label>
@@ -21,21 +21,21 @@
     </div>
 
     <!-- Filters for Food Type and Item Type -->
-    <div class="col-sm-6">
+    <div class="col-sm-5" style="max-width: 250px;">
         <label for="food-type-filter">Filter by Food Type:</label>
         <select id="food-type-filter" class="form-control" onchange="filterTable()">
             <option value="all">All</option>
             <option value="veg">Veg</option>
-            <option value="nonveg">Non-Veg</option>
+            <option value="nonveg">NonVeg</option>
         </select>
     </div>
 
-    <div class="col-sm-6">
+    <div class="col-sm-6" style="max-width: 250px;">
         <label for="item-type-filter">Filter by Item Type:</label>
         <select id="item-type-filter" class="form-control" onchange="filterTable()">
             <option value="all">All</option>
             <option value="grocery">Grocery</option>
-            <option value="cooked">Cooked Food</option>
+            <option value="cooked">Cooked</option>
         </select>
     </div>
 </div>
@@ -81,19 +81,26 @@
                                                         <th>Expiry Date</th>
                                                         <th>Location</th>
                                                         <th>Contact</th>
+                                                        <th>Action</th> <!-- Added Action Column -->
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {% for donor in donors %}
                                                     <tr>
                                                         <td>{{ loop.index }}</td>
-                                                        <td>{{ donor.name }}</td>
-                                                        <td>{{ donor.quantity }}</td>
-                                                        <td>{{ donor.food_type }}</td>
-                                                        <td>{{ donor.item_type }}</td>
-                                                        <td>{{ donor.expiry_date }}</td>
-                                                        <td>{{ donor.address }}</td>
-                                                        <td>{{ donor.contact }}</td>
+                                                        <td>{{ donor.food_name }}</td>
+                                                        <td>{{ donor.Quantity }}</td>
+                                                        <td>{{ donor.FoodType }}</td>
+                                                        <td>{{ donor.ItemType }}</td>
+                                                        <td>{{ donor.ExpiryDate }}</td>
+                                                        <td>{{ donor.donor_address }}</td>
+                                                        <td>{{ donor.donor_contact }}</td>
+                                                        <td>
+                                                            <form action="/food_bank/thank" method="POST"> <!-- Redirects to thank.html -->
+                                                                <input type="hidden" name="donor_id" value="{{ donor.id }}">
+                                                                <button type="submit" class="btn btn-primary">Place Order</button>
+                                                            </form>                                                            
+                                                        </td>
                                                     </tr>
                                                     {% endfor %}
                                                 </tbody>
@@ -113,56 +120,59 @@
 
 {% endblock content %}
 
-<!-- Specific Page JS -->
-{% block javascripts %}
+
+<!-- Specific Page JS -->{% block javascripts %}
 <script>
     function sortTable() {
-    let sortOption = document.getElementById("sort-option").value;
-    let table = document.getElementById("donor-table");
-    let rows = Array.from(table.rows).slice(1);
+        let sortOption = document.getElementById("sort-option").value;
+        let table = document.getElementById("donor-table");
+        let rows = Array.from(table.rows).slice(1);
 
-    rows.sort((rowA, rowB) => {
-        let valueA, valueB;
+        rows.sort((rowA, rowB) => {
+            let valueA, valueB;
 
-        if (sortOption === "quantity") {
-            valueA = parseInt(rowA.cells[2].innerText || 0);
-            valueB = parseInt(rowB.cells[2].innerText || 0);
-        } else if (sortOption === "distance") {
-            valueA = parseFloat(rowA.cells[6]?.innerText || 0);
-            valueB = parseFloat(rowB.cells[6]?.innerText || 0);
-        } else if (sortOption === "expiry_date") {
-            valueA = new Date(rowA.cells[5].innerText);
-            valueB = new Date(rowB.cells[5].innerText);
-        }
+            if (sortOption === "quantity") {
+                valueA = parseInt(rowA.cells[2].innerText || 0);
+                valueB = parseInt(rowB.cells[2].innerText || 0);
+            } else if (sortOption === "distance") {
+                valueA = parseFloat(rowA.cells[6]?.innerText || 0);
+                valueB = parseFloat(rowB.cells[6]?.innerText || 0);
+            } else if (sortOption === "expiry_date") {
+                valueA = new Date(rowA.cells[5].innerText);
+                valueB = new Date(rowB.cells[5].innerText);
+            }
 
-        return valueA > valueB ? 1 : -1;
-    });
+            return valueA > valueB ? 1 : -1;
+        });
 
-    rows.forEach(row => table.tBodies[0].appendChild(row));
-}
+        rows.forEach(row => table.tBodies[0].appendChild(row));
+    }
 
     function filterTable() {
-        // JavaScript function to filter table rows based on selected filters
-        let foodType = document.getElementById("food-type-filter").value;
-        let itemType = document.getElementById("item-type-filter").value;
+        let foodType = document.getElementById("food-type-filter").value.toLowerCase();
+        let itemType = document.getElementById("item-type-filter").value.toLowerCase();
 
-        // Loop through table rows and apply filters
         let table = document.getElementById("donor-table");
         let rows = table.getElementsByTagName("tr");
 
         for (let i = 1; i < rows.length; i++) {
-            let foodTypeCell = rows[i].getElementsByTagName("td")[3]?.innerText.toLowerCase();
-            let itemTypeCell = rows[i].getElementsByTagName("td")[4]?.innerText.toLowerCase();
+            let foodTypeCell = rows[i].getElementsByTagName("td")[3]?.innerText.toLowerCase().trim();
+            let itemTypeCell = rows[i].getElementsByTagName("td")[4]?.innerText.toLowerCase().trim();
             let showRow = true;
 
+            // Filter based on food type
             if (foodType !== "all" && foodType !== foodTypeCell) {
                 showRow = false;
             }
+            // Filter based on item type
             if (itemType !== "all" && itemType !== itemTypeCell) {
                 showRow = false;
             }
+
+            // Show or hide row based on filtering
             rows[i].style.display = showRow ? "" : "none";
         }
     }
 </script>
 {% endblock javascripts %}
+

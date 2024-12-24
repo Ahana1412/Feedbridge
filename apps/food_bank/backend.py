@@ -10,8 +10,8 @@ from dotenv import load_dotenv
 load_dotenv()
 # Fetch credentials from the environment file
 DB_HOST = os.getenv('DB_HOST')
-DB_USER = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_USER = os.getenv('DB_USERNAME')
+DB_PASSWORD = os.getenv('DB_PASS')
 DB_NAME = os.getenv('DB_NAME')
 
 def get_db_connection():
@@ -25,9 +25,7 @@ def get_db_connection():
     )
 
 def fetch_food_items():
-    """
-    Fetches available food items and their details from the database.
-    """
+    """Fetches available food items and their details from the database."""
     query = """
         SELECT 
             food.Name AS food_name,
@@ -41,16 +39,20 @@ def fetch_food_items():
         FROM food
         JOIN donor ON food.DonorID = donor.DonorID
     """
-    
+    connection = None
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
             cursor.execute(query)
             result = cursor.fetchall()
         return result
+    except Exception as e:
+        # Log the error and raise an exception
+        print(f"Error fetching food items: {str(e)}")
+        raise Exception(f"Error fetching food items: {str(e)}")
     finally:
-        connection.close()
-
+        if connection:
+            connection.close()  # Ensure the connection is closed after use
 
 def get_available_food_items():
     # Query the database for available food items
@@ -60,6 +62,27 @@ def get_available_food_items():
                WHERE f.Quantity > 0"""
     # Use your database connection to fetch this data
     return db.execute(query).fetchall()
+
+def add_order(food_id, food_bank_id, request_date, status):
+    """Inserts a new order into the orders table."""
+    query = """
+    INSERT INTO orders (FoodID, FoodBankID, RequestDate, Status)
+    VALUES (%s, %s, %s, %s)
+    """
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute(query, (food_id, food_bank_id, request_date, status))
+        connection.commit()
+    except Exception as e:
+        print(f"Error adding order: {str(e)}")
+        raise Exception(f"Error adding order: {str(e)}")
+    finally:
+        if connection:
+            connection.close()
+
+
 
 def calculate_distances(donors, user_location):
     api_key = "your api key"
@@ -71,4 +94,4 @@ def calculate_distances(donors, user_location):
 
     for i, donor in enumerate(donors):
         donor['distance'] = response['rows'][0]['elements'][i]['distance']['value']
-    return donors
+    return donors 
