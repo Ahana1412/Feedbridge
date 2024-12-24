@@ -32,6 +32,7 @@ CREATE TABLE food (
     RemainingShelfLife INT GENERATED ALWAYS AS (DATEDIFF(ExpiryDate, DonationDate)) STORED, -- Automatically calculated
     FoodType ENUM('Veg', 'NonVeg') NOT NULL,
     ItemType ENUM('Cooked', 'Grocery') NOT NULL,
+    Status ENUM('Available', 'Ordered') NOT NULL DEFAULT 'Available',
     FOREIGN KEY (DonorID) REFERENCES Donor(DonorID)
 );
 
@@ -60,10 +61,12 @@ CREATE TABLE orders (
     OrderID INT AUTO_INCREMENT PRIMARY KEY,
     FoodID INT NOT NULL,
     FoodBankID INT NOT NULL,
+    VolunteerID INT,
     RequestDate DATE NOT NULL,
-    Status ENUM('Pending', 'VolunteerAssigned', 'Completed') NOT NULL, 
+    Status ENUM('Pending', 'VolunteerAssigned', 'Completed') NOT NULL DEFAULT 'Pending', 
     FOREIGN KEY (FoodID) REFERENCES food(FoodID),
-    FOREIGN KEY (FoodBankID) REFERENCES foodbank(FoodBankID)
+    FOREIGN KEY (FoodBankID) REFERENCES foodbank(FoodBankID),
+    FOREIGN KEY (VolunteerID) REFERENCES volunteer(VolunteerID)
 );
 
 -- INSERT INTO users (username, password_hash, email, role) 

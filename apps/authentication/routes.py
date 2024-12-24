@@ -23,8 +23,8 @@ from apps.authentication.util import verify_pass, role_required
 def route_default():
     return redirect(url_for('authentication_blueprint.login'))
 
-# Login & Registration
 
+# Login & Registration
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def login():
@@ -147,15 +147,15 @@ def logout():
     logout_user()
     return redirect(url_for('authentication_blueprint.login')) 
 
-@blueprint.route('/food_bank_page')
-@role_required('food_bank')
-def food_bank_page():
-    return render_template('food_bank/food_bank_page.html')
+# @blueprint.route('/food_bank_page')
+# @role_required('food_bank')
+# def food_bank_page():
+#     return render_template('food_bank/food_bank_page.html')
 
-@blueprint.route('/donor_page')
-@role_required('donor')
-def donor_page():
-    return render_template('donor/donor_page.html')
+# @blueprint.route('/donor_page')
+# @role_required('donor')
+# def donor_page():
+#     return render_template('donor/donor_page.html')
 
 
 # Errors
