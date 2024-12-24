@@ -6,6 +6,7 @@ import pymysql
 import os
 from dotenv import load_dotenv
 
+
 # Load environment variables from the .env file
 load_dotenv()
 # Fetch credentials from the environment file
@@ -27,7 +28,8 @@ def get_db_connection():
 def fetch_food_items():
     """Fetches available food items and their details from the database."""
     query = """
-        SELECT 
+        SELECT
+            food.FoodID,  
             food.Name AS food_name,
             food.Quantity,
             food.FoodType,
@@ -38,6 +40,7 @@ def fetch_food_items():
             donor.ContactNo AS donor_contact
         FROM food
         JOIN donor ON food.DonorID = donor.DonorID
+        WHERE food.Status = 'Available'  -- Only select available food items
     """
     connection = None
     try:
@@ -54,33 +57,38 @@ def fetch_food_items():
         if connection:
             connection.close()  # Ensure the connection is closed after use
 
+
 def get_available_food_items():
-    # Query the database for available food items
-    query = """SELECT d.Name as donor_name, f.Quantity, f.FoodType, d.Address, d.ContactNo
+    """Fetches only available food items from the database."""
+    query = """SELECT 
+                    d.Name AS donor_name, 
+                    f.Quantity, 
+                    f.FoodType, 
+                    f.ItemType, 
+                    d.Address, 
+                    d.ContactNo
                FROM food f
                JOIN donor d ON f.DonorID = d.DonorID
-               WHERE f.Quantity > 0"""
+               WHERE f.Status = 'Available'  -- Only available food items
+               AND f.Quantity > 0"""  # Ensure the quantity is more than 0
     # Use your database connection to fetch this data
-    return db.execute(query).fetchall()
-
-def add_order(food_id, food_bank_id, request_date, status):
-    """Inserts a new order into the orders table."""
-    query = """
-    INSERT INTO orders (FoodID, FoodBankID, RequestDate, Status)
-    VALUES (%s, %s, %s, %s)
-    """
     connection = None
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
-            cursor.execute(query, (food_id, food_bank_id, request_date, status))
-        connection.commit()
+            cursor.execute(query)
+            result = cursor.fetchall()
+        return result
     except Exception as e:
-        print(f"Error adding order: {str(e)}")
-        raise Exception(f"Error adding order: {str(e)}")
+        # Log the error and raise an exception
+        print(f"Error fetching available food items: {str(e)}")
+        raise Exception(f"Error fetching available food items: {str(e)}")
     finally:
         if connection:
-            connection.close()
+            connection.close()  # Ensure the connection is closed after use
+
+
+
 
 
 
@@ -95,3 +103,4 @@ def calculate_distances(donors, user_location):
     for i, donor in enumerate(donors):
         donor['distance'] = response['rows'][0]['elements'][i]['distance']['value']
     return donors 
+

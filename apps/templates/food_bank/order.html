@@ -97,9 +97,10 @@
                                                         <td>{{ donor.donor_contact }}</td>
                                                         <td>
                                                             <form action="/food_bank/thank" method="POST"> <!-- Redirects to thank.html -->
-                                                                <input type="hidden" name="donor_id" value="{{ donor.id }}">
+                                                                <input type="hidden" name="food_id" value="{{ donor.FoodID }}"> <!-- Ensure FoodID is passed -->
                                                                 <button type="submit" class="btn btn-primary">Place Order</button>
-                                                            </form>                                                            
+                                                            </form>
+                                                                                                                       
                                                         </td>
                                                     </tr>
                                                     {% endfor %}

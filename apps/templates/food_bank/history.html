@@ -25,6 +25,7 @@
                                                         <th>Description</th>
                                                         <th>Request Date</th>
                                                         <th>Status</th>
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -35,6 +36,13 @@
                                                         <td>{{ order.Description }}</td>
                                                         <td>{{ order.RequestDate }}</td>
                                                         <td>{{ order.Status }}</td>
+                                                        <td>
+                                                            {% if order.Status != 'Received' %}
+                                                                <a href="{{ url_for('food_bank_blueprint.change_status', order_id=order.OrderID) }}" class="btn btn-primary">Mark as Received</a>
+                                                            {% else %}
+                                                                <span class="text-success">Received</span>
+                                                            {% endif %}
+                                                        </td>
                                                     </tr>
                                                     {% endfor %}
                                                 </tbody>
