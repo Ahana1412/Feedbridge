@@ -30,9 +30,8 @@ CREATE TABLE food (
     DonationDate DATE NOT NULL,
     ExpiryDate DATE NOT NULL,
     RemainingShelfLife INT GENERATED ALWAYS AS (DATEDIFF(ExpiryDate, DonationDate)) STORED, -- Automatically calculated
-    FoodType ENUM('Veg', 'Non-Veg') NOT NULL,
-    ItemType ENUM('Ready-to-Eat', 'Grocery') NOT NULL,
-    Perishability ENUM('Perishable', 'Non-Perishable') NOT NULL,
+    FoodType ENUM('Veg', 'NonVeg') NOT NULL,
+    ItemType ENUM('Cooked', 'Grocery') NOT NULL,
     FOREIGN KEY (DonorID) REFERENCES Donor(DonorID)
 );
 
@@ -43,7 +42,7 @@ CREATE TABLE volunteer (
     LastName VARCHAR(50) NOT NULL,
     ContactNo VARCHAR(15) NOT NULL,
     PreferredLocation VARCHAR(100),
-    Availability ENUM('Weekdays', 'Weekends', 'Full-Time', 'Part-Time'),
+    Availability ENUM('Weekdays', 'Weekends', 'FullTime', 'PartTime'),
     Address TEXT NOT NULL,
     FOREIGN KEY (UserID) REFERENCES users(id)
 );

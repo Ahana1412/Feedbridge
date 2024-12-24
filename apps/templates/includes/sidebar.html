@@ -37,7 +37,7 @@
                 {% if current_user.is_authenticated %}
                     {% if current_user.role == 'donor' %}
                         <li class="nav-item {% if 'donate' in segment %} active {% endif %}">
-                            <a href="{{ url_for('donor_blueprint.donor_profile') }}" class="nav-link">
+                            <a href="{{ url_for('donor_blueprint.new_donation') }}" class="nav-link">
                                 <span class="pcoded-micon"><i class="feather icon-heart"></i></span>
                                 <span class="pcoded-mtext">Donate</span>
                             </a>

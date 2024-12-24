@@ -1,0 +1,82 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} New Donation {% endblock %} 
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            <!-- [ Main Content ] start -->
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Fill in the donation details</h5>
+                                        </div>
+                                        <form role="form" method="post" action="">
+                                            <div class="card-block">
+                                                <div class="row">
+                                                    <div class="col-sm-6 mb-4">
+                                                        <div class="input-group mb-3">
+                                                            {{ form.food_name.label }}  
+                                                            {{ form.food_name(placeholder="Name", class="form-control") }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6 mb-4">
+                                                        <div class="input-group mb-3">
+                                                            {{ form.quantity(placeholder="Quantity", class="form-control") }}
+                                                        </div>
+                                                    </div>                                                
+                                                    <div class="col-sm-6 mb-4">
+                                                        <div class="input-group mb-3">
+                                                            {{ form.item_type(placeholder="Item Type", class="form-control") }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6 mb-4">
+                                                        <div class="input-group mb-3">
+                                                            {{ form.food_type(placeholder="Food Type", class="form-control") }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6 mb-4">
+                                                        <div class="input-group mb-3">
+                                                            {{ form.expiry_date(placeholder="Expiry Date", class="form-control") }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 mb-4">
+                                                        <div class="input-group mb-3">
+                                                            {{ form.food_description(placeholder="Description", class="form-control") }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-12 mb-2">
+                                                        <button type="submit" name="new_donation" class="btn btn-primary shadow-2 mb-4">Submit</button>
+                                                    </div>                                                
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- [ Main Content ] end -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <!-- [ Main Content ] end -->
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
