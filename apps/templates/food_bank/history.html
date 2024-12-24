@@ -38,10 +38,13 @@
                                                         <td>{{ order.Status }}</td>
                                                         <td>
                                                             {% if order.Status != 'Received' %}
-                                                                <a href="{{ url_for('food_bank_blueprint.change_status', order_id=order.OrderID) }}" class="btn btn-primary">Mark as Received</a>
-                                                            {% else %}
-                                                                <span class="text-success">Received</span>
-                                                            {% endif %}
+                                <form action="{{ url_for('food_bank_blueprint.change_status', order_id=order.OrderID) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-primary">Mark as Received</button>
+                                 </form>
+{% else %}
+    <span class="text-success">Received</span>
+{% endif %}
+
                                                         </td>
                                                     </tr>
                                                     {% endfor %}

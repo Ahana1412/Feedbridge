@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Delivery History</h1>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Food Name</th>
+            <th>Donor Name</th>
+            <th>Donor Contact</th>
+            <th>Food Bank Name</th>
+            <th>Food Bank Location</th>
+            <th>Food Bank Contact</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for delivery in deliveries %}
+        <tr>
+            <td>{{ delivery.OrderID }}</td>
+            <td>{{ delivery.FoodName }}</td>
+            <td>{{ delivery.DonorFirstName }} {{ delivery.DonorLastName }}</td>
+            <td>{{ delivery.DonorContact }}</td>
+            <td>{{ delivery.FoodBankName }}</td>
+            <td>{{ delivery.FoodBankAddress }}</td>
+            <td>{{ delivery.FoodBankContact }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7" class="text-center">No delivery history found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

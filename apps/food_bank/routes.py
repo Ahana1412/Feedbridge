@@ -5,7 +5,7 @@ Routes for the Food Bank role.
 
 # TODO edit as required
 
-from flask import render_template, request, flash
+from flask import render_template, request, flash, redirect
 from flask_login import login_required, current_user
 from apps.food_bank import blueprint
 from apps.authentication.util import role_required
@@ -139,39 +139,47 @@ def order_history():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@blueprint.route('/food_bank/history/change_status/<int:order_id>', methods=['GET', 'POST'])
+@blueprint.route('/food_bank/history/change_status/<int:order_id>', methods=['POST'])
 @login_required
 @role_required('food_bank')
 def change_status(order_id):
     """Handles changing the order status to 'Received'."""
     try:
-        # Fetch the order from the database
-        order = db.session.execute(
-            """
-            SELECT * FROM orders WHERE OrderID = :order_id AND FoodBankID = :food_bank_id
-            """,
-            {'order_id': order_id, 'food_bank_id': current_user.id}
-        ).fetchone()
+        user_id = current_user.id  # Current User ID
+        
+        # Establish a connection to the database
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            # Verify if the order belongs to the current food bank
+            cursor.execute("""
+                SELECT o.OrderID 
+                FROM orders o
+                JOIN foodbank fb ON o.FoodBankID = fb.FoodBankID
+                WHERE o.OrderID = %s AND fb.UserID = %s
+            """, (order_id, user_id))
+            order = cursor.fetchone()
 
-        if order:
+            if not order:
+                raise Exception("Order not found or unauthorized access.")
+
             # Update the status to 'Received'
-            db.session.execute(
-                """
-                UPDATE orders SET Status = 'Received' WHERE OrderID = :order_id
-                """,
-                {'order_id': order_id}
-            )
-            db.session.commit()
+            cursor.execute("""
+                UPDATE orders 
+                SET Status = 'Received' 
+                WHERE OrderID = %s
+            """, (order_id,))
+            connection.commit()
 
-            flash('Order status updated to "Received".', 'success')
-        else:
-            flash('Order not found or unauthorized access.', 'danger')
+        # Close the connection
+        connection.close()
+
+        # Flash success message and redirect to the order history page
+        flash('Order status updated to "Received".', 'success')
+        return redirect(url_for('food_bank_blueprint.order_history'))
 
     except Exception as e:
-        db.session.rollback()
-        flash(f'Error: {str(e)}', 'danger')
+        return jsonify({'error': str(e)}), 500
 
-    return redirect(url_for('food_bank_blueprint.order_history'))
 
     
 
