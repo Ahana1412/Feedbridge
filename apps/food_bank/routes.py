@@ -124,9 +124,14 @@ def order_history():
 
         # Step 2: Fetch orders for the logged-in FoodBank user using FoodBankID
         query = """
-        SELECT o.OrderID, o.RequestDate, o.Status, f.Name AS FoodName, f.Description
+        SELECT o.OrderID, o.RequestDate, o.Status, 
+               f.Name AS FoodName, f.Description, 
+               d.Name AS DonorName, d.Address AS DonorAddress, d.ContactNo AS DonorContact,
+               CONCAT(v.FirstName, ' ', v.LastName) AS VolunteerName, v.ContactNo AS VolunteerContact
         FROM orders o
         JOIN food f ON o.FoodID = f.FoodID
+        LEFT JOIN donor d ON f.DonorID = d.DonorID
+        LEFT JOIN volunteer v ON o.VolunteerID = v.VolunteerID
         WHERE o.FoodBankID = %s
         """
         
@@ -139,6 +144,8 @@ def order_history():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
 
 @blueprint.route('/food_bank/history/change_status/<int:order_id>', methods=['POST'])
 @login_required
