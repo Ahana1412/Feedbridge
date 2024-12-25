@@ -63,7 +63,7 @@ CREATE TABLE orders (
     FoodBankID INT NOT NULL,
     VolunteerID INT,
     RequestDate DATE NOT NULL,
-    Status ENUM('Pending', 'VolunteerAssigned', 'Completed') NOT NULL DEFAULT 'Pending', 
+    Status ENUM('Pending', 'VolunteerAssigned', 'Received') NOT NULL DEFAULT 'Pending', 
     FOREIGN KEY (FoodID) REFERENCES food(FoodID),
     FOREIGN KEY (FoodBankID) REFERENCES foodbank(FoodBankID),
     FOREIGN KEY (VolunteerID) REFERENCES volunteer(VolunteerID)

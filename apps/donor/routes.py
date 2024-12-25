@@ -31,12 +31,10 @@ def new_donation():
     if 'new_donation' in request.form:
         # Ensure current user is a donor
         if current_user.role != 'donor':
-            # flash('Only donors can log donations.', 'danger')
             return render_template('donor/new_donation.html',
                                        msg='Only donors can log donations.',
                                        success=False,
                                        form=form)
-            # return redirect(url_for('home_blueprint.home_page'))
 
         # Fetch the donor ID from the donor table
         donor = Donor.query.filter_by(user_id=current_user.id).first()
@@ -45,8 +43,6 @@ def new_donation():
                                        msg='Donor profile not found.',
                                        success=False,
                                        form=form)
-            # flash('Donor profile not found.', 'danger')
-            # return redirect(url_for('home_blueprint.home_page'))
 
         # Create a new donation entry
         try:
@@ -63,26 +59,20 @@ def new_donation():
             )
             db.session.add(new_donation)
             db.session.commit()
-            return render_template('donor/new_donation.html',
+            return render_template('donor/thank.html',
                                        msg='Donation successfully logged!',
                                        success=True,
                                        form=form)
             # flash('Donation successfully logged!', 'success')
-            # return redirect(url_for('home_blueprint.home_page'))
 
         except Exception as e:
             db.session.rollback()
             print(f"Database Error: {e}")
             flash('An error occurred while saving the donation.', 'danger')
 
-    # else:
-    #     if request.method == 'POST':
-    #         print("Form validation failed:", form.errors)
-    #         flash('Form validation failed. Please check your inputs.', 'warning')
-
-    print("Form submitted:", request.method)
-    print("Form valid:", form.validate_on_submit())
-    print("Form errors:", form.errors)
+    # print("Form submitted:", request.method)
+    # print("Form valid:", form.validate_on_submit())
+    # print("Form errors:", form.errors)
 
     return render_template('donor/new_donation.html', form=form)
 
