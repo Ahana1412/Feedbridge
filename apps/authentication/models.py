@@ -231,6 +231,7 @@ class Order(db.Model):
     order_id = db.Column('OrderID', db.Integer, primary_key=True)
     food_id = db.Column('FoodID', db.Integer, db.ForeignKey('food.FoodID'), nullable=False)
     foodbank_id = db.Column('FoodBankID', db.Integer, db.ForeignKey('foodbank.FoodBankID'), nullable=False)
+    volunteer_id = db.Column('VolunteerID', db.Integer, db.ForeignKey('volunteer.VolunteerID'), nullable=False)
     request_date = db.Column('RequestDate', db.Date, nullable=False)
     status = db.Column('Status', db.Enum('Pending', 'VolunteerAssigned', 'Completed'), nullable=False)
 

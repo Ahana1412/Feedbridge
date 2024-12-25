@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, Blueprint
 from flask_login import login_required, current_user
 from apps.donor import blueprint
 from apps.authentication.util import role_required
-from apps.authentication.models import Donor, Food  
+from apps.authentication.models import Donor, Food , Order, Volunteer, FoodBank
 from flask_login import login_required, current_user
 from apps import db
 from apps.donor.forms import DonationForm
@@ -99,3 +99,61 @@ def donation_history():
         flash('An error occurred while fetching donation history.', 'danger')
         return render_template('home/home.html')
 
+
+@blueprint.route('/orders', methods=['GET'])
+@login_required
+@role_required('donor')
+def order_history():
+    try:
+        # Step 1: Fetch the donor record
+        donor = Donor.query.filter_by(user_id=current_user.id).first()
+        
+        if not donor:
+            flash('Donor profile not found.', 'danger')
+            return render_template('home/home.html')
+        
+        # Step 2: Fetch food donations by this donor with 'Ordered' status
+        donations = Food.query.filter_by(donor_id=donor.donor_id, status='Ordered').all()
+        
+        if not donations:
+            return render_template('donor/order_history.html', orders=[])
+        
+        # Step 3: Collect all food IDs from these donations
+        food_ids = [donation.food_id for donation in donations]
+        
+        # Step 4: Fetch related orders using these food IDs
+        orders = Order.query.filter(Order.food_id.in_(food_ids)).all()
+        
+        # Step 5: Prepare order details with food, volunteer, and food bank data
+        order_details = []
+        for order in orders:
+            # Fetch related food item
+            food = next((d for d in donations if d.food_id == order.food_id), None)
+            
+            # Fetch food bank details
+            food_bank = FoodBank.query.filter_by(foodbank_id=order.foodbank_id).first()
+            
+            # Fetch volunteer details (if assigned)
+            volunteer = Volunteer.query.filter_by(volunteer_id=order.volunteer_id).first() if order.volunteer_id else None
+            
+            order_details.append({
+                'order_id': order.order_id,
+                'food_id': food.food_id,
+                'food_name': food.food_name,
+                'food_description': food.food_description,
+                'request_date': order.request_date,  
+                'status': order.status,
+                'foodbank_name': food_bank.name,
+                'foodbank_contact': food_bank.contact_number,
+                # 'foodbank_address': food_bank.address if food_bank else 'N/A',
+                'volunteer_name': volunteer.first_name if volunteer else 'Not assigned',
+                'volunteer_contact': volunteer.contact_number if volunteer else 'Not assigned'
+            })
+        
+        # Step 6: Pass the order details to the template
+        return render_template('donor/order_history.html', orders=order_details)
+    
+    except Exception as e:
+        print(f"Error fetching order history: {e}")
+        flash('An error occurred while fetching order history.', 'danger')
+        return render_template('home/home.html')
