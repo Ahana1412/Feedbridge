@@ -4,6 +4,8 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import os, random, string
+from pymongo import MongoClient
+
 
 class Config(object):
 
@@ -49,6 +51,18 @@ class Config(object):
 
             print('> Error: DBMS Exception: ' + str(e) )
             print('> Fallback to SQLite ')    
+
+    # MongoDB Configuration
+    MONGO_URI = os.getenv('MONGO_URI', None)
+    MONGO_DB_NAME = os.getenv('MONGO_DB_NAME', None)
+
+    try:
+        mongo_client = MongoClient(MONGO_URI)
+        mongo_db = mongo_client[MONGO_DB_NAME]
+    except Exception as e:
+        print(f'> Error: MongoDB Connection Exception: {str(e)}')
+        mongo_client = None
+        mongo_db = None
 
     # if USE_SQLITE:
 
