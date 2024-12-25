@@ -100,11 +100,12 @@
 
 <!-- Chatbot Link (Common for all roles) -->
 <li class="nav-item {% if 'chatbot' in segment %} active {% endif %}">
-<a href="{{ url_for('home_blueprint.home_page') }}" class="nav-link">
-    <span class="pcoded-micon"><i class="feather icon-message-circle"></i></span>
-    <span class="pcoded-mtext">Chatbot</span>
-</a>
+    <a href="{{ url_for('chatbot.chat') }}" class="nav-link">
+        <span class="pcoded-micon"><i class="feather icon-message-circle"></i></span>
+        <span class="pcoded-mtext">Chatbot</span>
+    </a>
 </li>
+
 
 
                 

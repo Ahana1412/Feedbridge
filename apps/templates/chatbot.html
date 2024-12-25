@@ -1,0 +1,108 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Chatbot {% endblock %}
+
+{% block stylesheets %}
+<!-- Your stylesheets -->
+{% endblock %}
+
+{% block content %}
+<!-- [ Main Content ] start -->
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <!-- [ Main Content ] start -->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <span class="mb-2 text-muted">
+                                    {% if msg %}
+                                        <span class="text-danger">{{ msg | safe }}</span>
+                                    {% endif %}
+                                </span>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Chat with the Bot</h5>
+                                    </div>
+                                    <div class="card-block">
+                                        <div class="row">
+                                            <!-- Chat Messages -->
+                                            <div class="col-sm-12 mb-4">
+                                                <div id="chat-window" class="border p-3" style="height: 300px; overflow-y: scroll; background-color: #f8f9fa;">
+                                                    {% for message in chat_history %}
+                                                        <div>
+                                                            <strong>{{ message.user_role }}:</strong> {{ message.query }}
+                                                        </div>
+                                                        <div>
+                                                            <strong>Bot:</strong> {{ message.response }}
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+
+                                            <!-- Chat Input -->
+                                            <div class="col-sm-12">
+                                                <form id="chat-form" role="form" method="post">
+                                                    <div class="form-group">
+                                                        <input type="text" name="query" id="query" class="form-control" placeholder="Type your message here" required />
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary shadow-2 mt-2">Send</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- [ Main Content ] end -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- [ Main Content ] end -->
+
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Handle form submission via AJAX
+        $('#chat-form').on('submit', function(e) {
+            e.preventDefault(); // Prevent the form from submitting normally
+
+            var query = $('#query').val(); // Get the query from the input field
+
+            // Send the query to the Flask route using AJAX
+            $.ajax({
+                url: "{{ url_for('chatbot.chat') }}", // Your chatbot route
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    user_id: "12345", // Replace with actual user ID
+                    user_role: "user", // Replace with actual user role
+                    query: query
+                }),
+                success: function(data) {
+                    // Append bot response to the chat window
+                    var responseHtml = "<div><strong>Bot:</strong> " + data.response + "</div>";
+                    $('#chat-window').append(responseHtml);
+
+                    // Clear the input field
+                    $('#query').val('');
+                    // Scroll to the bottom of the chat window
+                    $('#chat-window').scrollTop($('#chat-window')[0].scrollHeight);
+                },
+                error: function() {
+                    alert('Error: Could not get response from the bot.');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
