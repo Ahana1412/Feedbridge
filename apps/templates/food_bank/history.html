@@ -1,23 +1,40 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Order History {% endblock %}
+{% block title %} Food Bank Order History {% endblock %}
 
 {% block content %}
+<!-- [ Main Content ] start -->
 <div class="pcoded-main-container">
     <div class="pcoded-wrapper">
         <div class="pcoded-content">
             <div class="pcoded-inner-content">
                 <div class="page-header">
-                    <h5>Your Order History</h5>
+                    <div class="page-block">
+                        <div class="row align-items-center">
+                            <div class="col-md-12">
+                                <div class="page-header-title">
+                                    <h5 class="m-b-10">Food Bank Order History</h5>
+                                </div>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                    <li class="breadcrumb-item"><a href="javascript:">Orders</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="main-body">
                     <div class="page-wrapper">
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="card">
-                                    <div class="card-block">
-                                        {% if orders %}
-                                            <table class="table">
+                                    <div class="card-header">
+                                        <h5>Your Order History</h5>
+                                        <span class="d-block m-t-5">Details of your past orders</span>
+                                    </div>
+                                    <div class="card-block table-border-style">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
                                                 <thead>
                                                     <tr>
                                                         <th>Order ID</th>
@@ -25,6 +42,11 @@
                                                         <th>Description</th>
                                                         <th>Request Date</th>
                                                         <th>Status</th>
+                                                        <th>Donor Name</th>
+                                                        <th>Donor Contact</th>
+                                                        <th>Donor Location</th>
+                                                        <th>Volunteer Name</th>
+                                                        <th>Volunteer Contact</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -36,23 +58,29 @@
                                                         <td>{{ order.Description }}</td>
                                                         <td>{{ order.RequestDate }}</td>
                                                         <td>{{ order.Status }}</td>
+                                                        <td>{{ order.DonorName }}</td>
+                                                        <td>{{ order.DonorContact }}</td>
+                                                        <td>{{ order.DonorAddress }}</td>
+                                                        <td>{{ order.VolunteerName or '-' }}</td>
+                                                        <td>{{ order.VolunteerContact or '-' }}</td>
                                                         <td>
                                                             {% if order.Status != 'Received' %}
-                                <form action="{{ url_for('food_bank_blueprint.change_status', order_id=order.OrderID) }}" method="POST" style="display: inline;">
-                                    <button type="submit" class="btn btn-primary">Mark as Received</button>
-                                 </form>
-{% else %}
-    <span class="text-success">Received</span>
-{% endif %}
-
+                                                                <form method="POST" action="{{ url_for('food_bank_blueprint.change_status', order_id=order.OrderID) }}">
+                                                                    <button type="submit" class="btn btn-primary">Mark as Received</button>
+                                                                </form>
+                                                            {% else %}
+                                                                <span class="text-success">Received</span>
+                                                            {% endif %}
                                                         </td>
+                                                    </tr>
+                                                    {% else %}
+                                                    <tr>
+                                                        <td colspan="11" class="text-center">No orders placed yet.</td>
                                                     </tr>
                                                     {% endfor %}
                                                 </tbody>
                                             </table>
-                                        {% else %}
-                                            <p>No orders placed yet.</p>
-                                        {% endif %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -63,4 +91,5 @@
         </div>
     </div>
 </div>
+<!-- [ Main Content ] end -->
 {% endblock %}

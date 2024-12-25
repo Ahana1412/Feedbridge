@@ -68,20 +68,23 @@
     </li>
 {% elif current_user.role == 'volunteer' %}
     <!-- Volunteer Link -->
-    <li class="nav-item {% if 'deliver' in segment %} active {% endif %}">
+
+    <li class="nav-item {% if 'deliver' in request.path %} active {% endif %}">
         <a href="{{ url_for('volunteer_blueprint.volunteer_tasks') }}" class="nav-link">
             <span class="pcoded-micon"><i class="feather icon-users"></i></span>
             <span class="pcoded-mtext">Volunteer</span>
         </a>
     </li>
-    
-    <!-- History Link for Volunteer -->
-    <li class="nav-item {% if 'history' in segment %} active {% endif %}">
+
+    <!-- Volunteer History Page -->
+    <li class="nav-item {% if 'history' in request.path %} active {% endif %}">
         <a href="{{ url_for('volunteer_blueprint.delivery_history') }}" class="nav-link">
             <span class="pcoded-micon"><i class="feather icon-clock"></i></span>
             <span class="pcoded-mtext">Volunteer History</span>
         </a>
     </li>
+
+
 
 
 
