@@ -191,7 +191,6 @@ class Food(db.Model):
     quantity = db.Column('Quantity', db.Integer)
     donation_date = db.Column('DonationDate', db.Date, nullable=False)
     expiry_date = db.Column('ExpiryDate', db.Date, nullable=False)
-    # remaining_shelf_life = db.Column('RemainingShelfLife', db.Integer, nullable=True)  # Will be auto-calculated in MySQL
     food_type = db.Column('FoodType', db.Enum('Veg', 'NonVeg'), nullable=False)
     item_type = db.Column('ItemType', db.Enum('Cooked', 'Grocery'), nullable=False)
     status = db.Column('Status', db.Enum('Available', 'Ordered'), nullable=False)  # Will be auto-calculated in MySQL

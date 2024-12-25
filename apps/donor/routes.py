@@ -77,58 +77,25 @@ def new_donation():
     return render_template('donor/new_donation.html', form=form)
 
 
-
-# @blueprint.route('/donor/new_donation', methods=['GET', 'POST'])
-# @login_required
-# def new_donation():
-#     form = DonationForm()
-#     if 'new_donation' in request.form:
-#         # Ensure current user is a donor
-#         if current_user.role != 'donor':
-#             flash('Only donors can log donations.', 'danger')
-#             return redirect(url_for('home_blueprint.home_page'))
-
-#         # Fetch the donor ID from the donor table
-#         donor = Donor.query.filter_by(user_id=current_user.id).first()
-#         if not donor:
-#             flash('Donor profile not found.', 'danger')
-#             return redirect(url_for('home_blueprint.home_page'))
-
-#         # Create a new donation entry
-#         new_donation = Food(
-#             donor_id=donor.donor_id,
-#             quantity=form.quantity.data,
-#             donation_date=datetime.now().date(),
-#             expiry_date=form.expiry_date.data,
-#             food_type=form.food_type.data,
-#             item_type=form.item_type.data,
-#             food_name=form.food_name.data,
-#             food_description=form.food_description.data
-#         )
-#         db.session.add(new_donation)
-#         db.session.commit()
+@blueprint.route('/donations', methods=['GET'])
+@login_required
+@role_required('donor')
+def donation_history():
+    try:
+        # Fetch the donor ID from the donor table
+        donor = Donor.query.filter_by(user_id=current_user.id).first()
         
-#         flash('Donation successfully logged!', 'success')
-#         return redirect(url_for('home_blueprint.home_page'))
+        if not donor:
+            flash('Donor profile not found.', 'danger')
+            return render_template('home/home.html')
 
-#     return render_template('donor/new_donation.html', form=form)
-
-# TODO edit as required
-
-# @blueprint.route('/donor/donations', methods=['GET', 'POST'])
-# @login_required
-# @role_required('donor')
-# def manage_donations():
-#     if request.method == 'POST':
-#         # Handle donation updates
-#         donation_id = request.form['donation_id']
-#         status = request.form['status']
-#         # Update the database (example logic)
-#         donation = Donations.query.get(donation_id)
-#         donation.status = status
-#         db.session.commit()
-#         return redirect(url_for('donor_blueprint.donations_history'))
+        # Fetch donations made by this donor
+        donations = Food.query.filter_by(donor_id=donor.donor_id).all()
+        
+        return render_template('donor/donation_history.html', donations=donations)
     
-#     # Fetch donations for the logged-in donor
-#     donations = Donations.query.filter_by(donor_id=current_user.id).all()
-#     return render_template('donor/donations_history.html', donations=donations)
+    except Exception as e:
+        print(f"Error fetching donation history: {e}")
+        flash('An error occurred while fetching donation history.', 'danger')
+        return render_template('home/home.html')
+

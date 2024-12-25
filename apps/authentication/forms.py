@@ -54,11 +54,11 @@ class CreateAccountForm(FlaskForm):
                                  ('GroceryStore', 'Grocery Store'),
                                  ('Others', 'Others')
                              ],
-                             validators=[Optional()])
+                             validators=[DataRequired()])
 
     # Volunteer-specific fields
-    first_name = StringField('First Name', validators=[Optional(), Length(max=50)])
-    last_name = StringField('Last Name', validators=[Optional(), Length(max=50)])
+    first_name = StringField('First Name', validators=[DataRequired(), Length(max=50)])
+    last_name = StringField('Last Name', validators=[DataRequired(), Length(max=50)])
     preferred_location = StringField('Preferred Location', validators=[Optional(), Length(max=100)])
     availability = SelectField('Availability',
                                 choices=[
