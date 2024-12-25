@@ -15,6 +15,7 @@ from datetime import date
 import pymysql
 import os
 from dotenv import load_dotenv
+from flask import url_for
 
 load_dotenv()
 # Fetch credentials from the environment file
