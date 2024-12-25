@@ -81,31 +81,42 @@ def volunteer_tasks():
 @role_required('volunteer')
 def delivery_history():
     try:
+        # Fetch the VolunteerID using current_user.id (which is the UserID in the users table)
         connection = get_db_connection()
         with connection.cursor() as cursor:
-            query = """
-            SELECT o.OrderID, f.Name AS FoodName, 
-                   d.Name AS DonorName, 
-                   d.ContactNo AS DonorContact, fb.Name AS FoodBankName, 
-                   fb.Address AS FoodBankAddress, fb.ContactNo AS FoodBankContact
-            FROM orders o
-            JOIN food f ON o.FoodID = f.FoodID
-            JOIN donor d ON f.DonorID = d.DonorID
-            JOIN foodbank fb ON o.FoodBankID = fb.FoodBankID
-            WHERE o.Status = 'Received' AND o.VolunteerID = %s
-            """
-            cursor.execute(query, (current_user.id,))
-            deliveries = cursor.fetchall()
-            
-            # Debugging: Print deliveries result
-            print("Deliveries:", deliveries) 
-            
+            cursor.execute("SELECT VolunteerID FROM volunteer WHERE UserID = %s", (current_user.id,))
+            volunteer = cursor.fetchone()
 
+            if volunteer is None:
+                flash('Volunteer profile not found.', 'error')
+                return render_template('volunteer/history.html', deliveries=[])
+
+            volunteer_id = volunteer['VolunteerID']
+
+        # Fetch deliveries for the logged-in Volunteer user using VolunteerID
+        query = """
+        SELECT o.OrderID, f.Name AS FoodName, 
+               d.Name AS DonorName, 
+               d.ContactNo AS DonorContact, fb.Name AS FoodBankName, 
+               fb.Address AS FoodBankAddress, fb.ContactNo AS FoodBankContact
+        FROM orders o
+        JOIN food f ON o.FoodID = f.FoodID
+        JOIN donor d ON f.DonorID = d.DonorID
+        JOIN foodbank fb ON o.FoodBankID = fb.FoodBankID
+        WHERE o.Status = 'Received' AND o.VolunteerID = %s
+        """
+        
+        with connection.cursor() as cursor:
+            cursor.execute(query, (volunteer_id,))
+            deliveries = cursor.fetchall()
+
+        # Return the deliveries in the template
         return render_template('volunteer/history.html', deliveries=deliveries)
 
     except Exception as e:
         flash(f"Error retrieving delivery history: {str(e)}", "danger")
         return redirect(url_for('volunteer_blueprint.volunteer_profile'))
+
 
 
 
