@@ -3,7 +3,29 @@
 {% block title %} New Donation {% endblock %}
 
 <!-- Specific CSS goes HERE -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+<style>
+    /* Full-Page Loading Overlay */
+    #loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #loading-overlay .spinner-border {
+        width: 3rem;
+        height: 3rem;
+    }
+</style>
+{% endblock stylesheets %}
+
 
 {% block content %}
 
@@ -20,7 +42,6 @@
                                 <span class="mb-2 text-muted">
                                     {% if msg %}
                                         <span class="text-danger">{{ msg | safe }}</span>
-                            
                                     {% endif %} 
                                 </span>
 
@@ -32,7 +53,8 @@
                                     {% if success %}
                                         <a href="{{ url_for('home_blueprint.home_page') }}" class="btn btn-primary shadow-2 mb-4">Back to Home</a>
                                     {% else %}
-                                        <form role="form" method="post" action="">
+                                        <!-- Add enctype for image uploads -->
+                                        <form role="form" method="post" action="" enctype="multipart/form-data" id="donation-form">
                                             {{ form.hidden_tag() }}
                                             <div class="card-block">
                                                 <div class="row">
@@ -49,7 +71,7 @@
                                                     <div class="col-sm-6 mb-4">
                                                         <div class="form-group">
                                                             {{ form.quantity.label(class="form-label") }}
-                                                            {{ form.quantity(class="form-control", placeholder="Enter Quantity (in kg)") }}
+                                                            {{ form.quantity(class="form-control", placeholder="Enter Quantity (in kg/ no. of plates)") }}
                                                         </div>
                                                     </div>
 
@@ -57,7 +79,7 @@
                                                     <div class="col-sm-6 mb-4">
                                                         <div class="form-group">
                                                             {{ form.item_type.label(class="form-label") }}
-                                                            {{ form.item_type(class="form-control") }}
+                                                            {{ form.item_type(class="form-control", id="item_type", onchange="toggleImageRequirement()") }}
                                                         </div>
                                                     </div>
 
@@ -85,9 +107,20 @@
                                                         </div>
                                                     </div>
 
-                                                    <!-- Submit Button -->
+                                                    <!-- Food Image Upload -->
+                                                    <div class="col-sm-12 mb-4">
+                                                        <div class="form-group">
+                                                            <label for="food_image" class="form-label">Upload Food Image</label>
+                                                            <input type="file" name="food_image" id="food_image" class="form-control" accept="image/*">
+                                                            <small id="image-help" class="form-text text-muted">Required if Item Type is Grocery</small>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Submit Button with Spinner -->
                                                     <div class="col-sm-12 mb-2">
-                                                        <button type="submit" name="new_donation" class="btn btn-primary shadow-2 mb-4">Submit</button>
+                                                        <button type="submit" id="submit-btn" name="new_donation" class="btn btn-primary shadow-2 mb-4">
+                                                            Submit
+                                                        </button>
                                                     </div>
 
                                                 </div>
@@ -104,9 +137,15 @@
         </div>
     </div>
 </div>
-<!-- [ Main Content ] end -->
+
+<!-- Loading Overlay -->
+<div id="loading-overlay">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="text-muted mt-2">Processing your donation, please wait...</p>
+</div>
 
 {% endblock content %}
 
-<!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+    <script src="{{ url_for('static', filename='assets/js/pages/toggle-image-requirement.js') }}"></script>
+{% endblock javascripts %}
