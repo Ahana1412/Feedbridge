@@ -1,3 +1,4 @@
+
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 from fuzzywuzzy import fuzz
@@ -24,6 +25,7 @@ knowledge_base = {
     "default": "I'm sorry, I didn't understand that. Could you please rephrase your question or ask about donating, ordering, volunteering, or profile updates?"
 }
 
+
 # Define intents and associated keywords
 intents = {
     "donate_food": ["donate food", "how to donate", "food donation", "donate", "fruits", "vegetables", "give food", "can I donate", "where to donate"],
@@ -48,30 +50,14 @@ def match_intent(user_input):
                 return intent
     return "default"
 
-# Start a conversation
-chat_history = ""
-
-print("Bot: Welcome to the Food Bank Assistant! How can I help you today? (Type 'exit' to quit)")
-
-while True:
-    user_input = input("You: ")
-
-    if user_input.lower() in ["exit", "quit"]:
-        print("Bot: Goodbye! Have a great day!")
-        break
-
-    # Match the user input to an intent
+# Function to generate chatbot response
+def generate_response(user_input):
     matched_intent = match_intent(user_input)
-
     if matched_intent in knowledge_base:
-        # Provide a response from the knowledge base if intent matches
-        response = knowledge_base[matched_intent]
+        # Respond from knowledge base
+        return knowledge_base[matched_intent]
     else:
-        # Otherwise, generate a response using DialoGPT
+        # Generate response using DialoGPT
         new_input_ids = tokenizer.encode(user_input + tokenizer.eos_token, return_tensors="pt")
-        bot_input_ids = new_input_ids if chat_history == "" else torch.cat([chat_history, new_input_ids], dim=-1)
-
-        chat_history = model.generate(bot_input_ids, max_length=1000, pad_token_id=tokenizer.eos_token_id)
-        response = tokenizer.decode(chat_history[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)
-
-    print(f"Bot: {response}") 
+        response_ids = model.generate(new_input_ids, max_length=1000, pad_token_id=tokenizer.eos_token_id)
+        return tokenizer.decode(response_ids[0], skip_special_tokens=True)
