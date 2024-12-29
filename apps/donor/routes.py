@@ -8,7 +8,12 @@ from apps import db
 from apps.donor.forms import DonationForm
 from datetime import datetime
 from flask import current_app
-
+from io import BytesIO
+from PIL import Image
+import numpy as np
+import os
+import tensorflow as tf
+from tensorflow.keras.preprocessing import image
 
 
 @blueprint.route('/profile')
@@ -30,19 +35,32 @@ def new_donation():
         # Ensure current user is a donor
         if current_user.role != 'donor':
             return render_template('donor/new_donation.html',
-                                       msg='Only donors can log donations.',
-                                       success=False,
-                                       form=form)
+                                   msg='Only donors can log donations.',
+                                   success=False,
+                                   form=form)
 
         # Fetch the donor ID from the donor table
         donor = Donor.query.filter_by(user_id=current_user.id).first()
         if not donor:
             return render_template('donor/new_donation.html',
-                                       msg='Donor profile not found.',
-                                       success=False,
-                                       form=form)
+                                   msg='Donor profile not found.',
+                                   success=False,
+                                   form=form)
 
-        # Create a new donation entry
+        # Handle the image upload and classification
+        if form.item_type.data == 'Grocery':
+            uploaded_file = request.files['food_image']
+            if uploaded_file:
+                # Read image into memory as a byte stream
+                img_bytes = uploaded_file.read()
+                # Call the detect_food_spoilage function with the image in-memory
+                spoilage_status = detect_food_spoilage(img_bytes)
+                if spoilage_status == 'rotten':
+                    return render_template('donor/confirmation.html',
+                                        msg='Unfortunately, your donation was rejected because the food is not fresh. Rotten food is not accepted.',
+                                        success=False)
+
+        # If food is fresh, proceed to create a new donation entry
         try:
             new_donation = Food(
                 donor_id=donor.donor_id,
@@ -57,22 +75,112 @@ def new_donation():
             )
             db.session.add(new_donation)
             db.session.commit()
-            return render_template('donor/thank.html',
-                                       msg='Donation successfully logged!',
-                                       success=True,
-                                       form=form)
-            # flash('Donation successfully logged!', 'success')
+
+            # Return the success page
+            return render_template('donor/confirmation.html',
+                                   msg='Donation successfully logged!',
+                                   success=True)
 
         except Exception as e:
             db.session.rollback()
             print(f"Database Error: {e}")
             flash('An error occurred while saving the donation.', 'danger')
 
-    # print("Form submitted:", request.method)
-    # print("Form valid:", form.validate_on_submit())
-    # print("Form errors:", form.errors)
-
     return render_template('donor/new_donation.html', form=form)
+
+
+def preprocess_image(img_bytes, target_size=(224, 224)):
+    """Preprocess the image to be used for model inference."""
+
+    img = Image.open(BytesIO(img_bytes))
+    img = img.resize(target_size)    
+    img_array = image.img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0)    
+    img_array = tf.keras.applications.efficientnet.preprocess_input(img_array)
+    
+    return img_array
+
+
+def detect_food_spoilage(image_bytes):
+    """Function to detect spoilage based on the uploaded image using the pre-trained model."""
+    try:
+        img_array = preprocess_image(image_bytes)
+
+        model = tf.keras.models.load_model(os.getenv('MODEL_PATH'))
+        predictions = model.predict(img_array)
+
+        predicted_class = np.argmax(predictions, axis=1)
+        confidence_scores = predictions[0]
+
+        class_labels = ['fresh', 'rotten']
+        predicted_label = class_labels[predicted_class[0]]
+        confidence_score = confidence_scores[predicted_class[0]]
+
+        # Log prediction details for debugging
+        print(f"Predicted class index: {predicted_class[0]}")
+        print(f"Predicted label: {predicted_label}")
+        print(f"Confidence score: {confidence_score:.4f}")
+
+        return predicted_label
+
+    except Exception as e:
+        print(f"Error in spoilage detection: {e}")
+        return 'error'
+
+
+# @blueprint.route('/new_donation', methods=['GET', 'POST'])
+# @login_required
+# @role_required('donor')
+# def new_donation():
+#     form = DonationForm()
+
+#     if 'new_donation' in request.form:
+#         # Ensure current user is a donor
+#         if current_user.role != 'donor':
+#             return render_template('donor/new_donation.html',
+#                                        msg='Only donors can log donations.',
+#                                        success=False,
+#                                        form=form)
+
+#         # Fetch the donor ID from the donor table
+#         donor = Donor.query.filter_by(user_id=current_user.id).first()
+#         if not donor:
+#             return render_template('donor/new_donation.html',
+#                                        msg='Donor profile not found.',
+#                                        success=False,
+#                                        form=form)
+
+#         # Create a new donation entry
+#         try:
+#             new_donation = Food(
+#                 donor_id=donor.donor_id,
+#                 quantity=form.quantity.data,
+#                 donation_date=datetime.now().date(),
+#                 expiry_date=form.expiry_date.data,
+#                 food_type=form.food_type.data,
+#                 item_type=form.item_type.data,
+#                 food_name=form.food_name.data,
+#                 food_description=form.food_description.data,
+#                 status='Available'
+#             )
+#             db.session.add(new_donation)
+#             db.session.commit()
+#             return render_template('donor/confirmation.html',
+#                                        msg='Donation successfully logged!',
+#                                        success=True,
+#                                        form=form)
+#             # flash('Donation successfully logged!', 'success')
+
+#         except Exception as e:
+#             db.session.rollback()
+#             print(f"Database Error: {e}")
+#             flash('An error occurred while saving the donation.', 'danger')
+
+#     # print("Form submitted:", request.method)
+#     # print("Form valid:", form.validate_on_submit())
+#     # print("Form errors:", form.errors)
+
+#     return render_template('donor/new_donation.html', form=form)
 
 
 @blueprint.route('/donations', methods=['GET'])
@@ -125,13 +233,8 @@ def order_history():
         # Step 5: Prepare order details with food, volunteer, and food bank data
         order_details = []
         for order in orders:
-            # Fetch related food item
             food = next((d for d in donations if d.food_id == order.food_id), None)
-            
-            # Fetch food bank details
             food_bank = FoodBank.query.filter_by(foodbank_id=order.foodbank_id).first()
-            
-            # Fetch volunteer details (if assigned)
             volunteer = Volunteer.query.filter_by(volunteer_id=order.volunteer_id).first() if order.volunteer_id else None
             
             order_details.append({
@@ -148,7 +251,6 @@ def order_history():
                 'volunteer_contact': volunteer.contact_number if volunteer else 'Not assigned'
             })
         
-        # Step 6: Pass the order details to the template
         return render_template('donor/order_history.html', orders=order_details)
     
     except Exception as e:
@@ -157,10 +259,10 @@ def order_history():
         return render_template('home/home.html')
     
 
-@blueprint.route('/test_mongo', methods=['POST', 'GET'])
-def test_mongo():
-    mongo_db = current_app.config['mongo_db']
-    if mongo_db:
-        mongo_db.notifications.insert_one({"message": "MongoDB connection works!"})
-        return "MongoDB Test Successful"
-    return "MongoDB Not Configured Properly"
+# @blueprint.route('/test_mongo', methods=['POST', 'GET'])
+# def test_mongo():
+#     mongo_db = current_app.config['mongo_db']
+#     if mongo_db:
+#         mongo_db.notifications.insert_one({"message": "MongoDB connection works!"})
+#         return "MongoDB Test Successful"
+#     return "MongoDB Not Configured Properly"
