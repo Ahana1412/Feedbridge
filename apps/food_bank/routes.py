@@ -86,7 +86,7 @@ def place_order():
             # 3. Update the status of the food item to "Ordered"
             update_food_query = """
             UPDATE food
-            SET Status = 'Ordered'
+            SET Status = 'Ordered' 
             WHERE FoodID = %s
             """
             cursor.execute(update_food_query, (food_id,))

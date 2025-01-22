@@ -2,27 +2,22 @@
 
 {% block title %} Food Waste Reduction {% endblock %}
 
-<!-- Specific CSS goes HERE -->
 {% block stylesheets %}
-    <!-- Include any custom CSS for the homepage if needed -->
    <link rel="stylesheet" href="../static/assets/css/style.css">
     <style>
-        /* Full screen width image */
         .hero-image {
-            width: 100%; /* Full width of the screen */
-            height: 50vh; /* Half of the viewport height */
-            object-fit: cover; /* Ensures image covers the area without stretching */
+            width: 100%;
+            height: 50vh;
+            object-fit: cover;
         }
 
-        /* Content below the image */
         .content {
             padding: 20px;
-            height: 50vh; /* Make content take up the other half of the page */
-            overflow-y: scroll; /* Make content scrollable */
-            background-color: #f4f4f4; /* Optional background color */
+            height: 50vh;
+            overflow-y: scroll;
+            background-color: #f4f4f4;
         }
 
-        /* Optional: for better readability */
         .content h5 {
             margin-top: 20px;
         }
@@ -35,85 +30,150 @@
 
 {% block content %}
 
-    <!-- [ Main Content ] start -->
-    <div class="pcoded-main-container">
-        <div class="pcoded-wrapper">
-            <div class="pcoded-content">
-                <div class="pcoded-inner-content">
-                    <!-- [ breadcrumb ] start -->
-                    <div class="page-header">
-                        <div class="page-block">
-                            <div class="row align-items-center">
-                                <div class="col-md-12">
-                                    <div class="page-header-title">
-                                        <h5 class="m-b-10">Welcome to the Food Waste Management System</h5>
-                                    </div>
-                                    <ul class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
-                                        <li class="breadcrumb-item"><a href="javascript:">Home</a></li>
-                                    </ul>
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="page-header">
+                    <div class="page-block">
+                        <div class="row align-items-center">
+                            <div class="col-md-12">
+                                <div class="page-header-title">
+                                    <h5 class="m-b-10">Welcome to the Food Waste Management System</h5>
                                 </div>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                    <li class="breadcrumb-item"><a href="javascript:">Home</a></li>
+                                </ul>
                             </div>
                         </div>
                     </div>
-                    <!-- [ breadcrumb ] end -->
-                    <div class="main-body">
-                        <div class="page-wrapper">
-                            <!-- [ Main Content ] start -->
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="card">
-                                        <!-- Full screen width image -->
-                                        <div class="card-header">
-                                            <img id="food-waste-image" src="{{ url_for('static', filename='Imgs/Home_img.jpg') }}" alt="Food Waste Awareness" class="hero-image" />
-                                        </div>
-
-                                        <!-- Scrollable Text Content -->
-                                        <div class="content">
-                                            <h5>What is Food Wastage?</h5>
-                                            <p>
-                                                Food wastage is a major global issue that contributes to environmental damage, economic loss, and social inequality. Every year, millions of tons of food are wasted, even though many people around the world struggle with hunger. 
-                                                <br>
-                                                Through our platform, we aim to connect donors, food banks, and volunteers to reduce food waste and ensure that surplus food is directed to those who need it most.
-                                            </p>
-                                            
-                                            <h5>Our Mission</h5>
-                                            <p>
-                                                Our mission is to create a sustainable and effective system for food waste management by enabling restaurants, grocery stores, and individuals to donate food and make a positive impact on the environment and society.
-                                            </p>
-                                        </div>
+                </div>
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <img id="food-waste-image" src="{{ url_for('static', filename='Imgs/Home_img.jpg') }}" alt="Food Waste Awareness" class="hero-image" />
+                                    </div>
+                                    <div class="content">
+                                        <h5>What is Food Wastage?</h5>
+                                        <p>
+                                            Food wastage is a major global issue that contributes to environmental damage, economic loss, and social inequality. Every year, millions of tons of food are wasted, even though many people around the world struggle with hunger. 
+                                            <br>
+                                            Through our platform, we aim to connect donors, food banks, and volunteers to reduce food waste and ensure that surplus food is directed to those who need it most.
+                                        </p>
+                                        <h5>Our Mission</h5>
+                                        <p>
+                                            Our mission is to create a sustainable and effective system for food waste management by enabling restaurants, grocery stores, and individuals to donate food and make a positive impact on the environment and society.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
-                            <!-- [ Main Content ] end -->
+                        </div>
+
+                        <!-- Charts Section -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Weekly Donations</h5>
+                                <canvas id="weeklyDonationsChart"></canvas>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Top Donated Food Items</h5>
+                                <canvas id="topFoodItemsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Top Donor Locations</h5>
+                                <canvas id="topLocationsChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- [ Main Content ] end -->
+</div>
 
 {% endblock content %}
 
-<!-- Specific Page JS goes HERE -->
 {% block javascripts %}
-    <!-- Include any custom JS for dynamic features like changing images, sliders, etc. -->
-    <script>
-         let images = [
-        "{{ url_for('static', filename='imgs/Home_img.jpg') }}",
-        "{{ url_for('static', filename='imgs/Home_img2.jpg') }}",
-        "{{ url_for('static', filename='imgs/Home_img3.png') }}"
-    ];
-    
-        let currentIndex = 0;
-    
-        function changeImage() {
-            currentIndex = (currentIndex + 1) % images.length;
-            document.getElementById('food-waste-image').src = images[currentIndex];
+<script>
+    const weeklyDonations = {{ weekly_donations | tojson }};
+    const topFoodItems = {{ top_food_items | tojson }};
+    const topLocations = {{ top_locations | tojson }};
+
+    // Weekly Donations Chart
+    const weeklyLabels = weeklyDonations.map(d => `Week ${d.Week}`);
+    const weeklyData = weeklyDonations.map(d => d.TotalDonations);
+    new Chart(document.getElementById('weeklyDonationsChart'), {
+        type: 'bar',
+        data: {
+            labels: weeklyLabels,
+            datasets: [{
+                label: 'Weekly Donations',
+                data: weeklyData,
+                backgroundColor: 'rgba(75, 192, 192, 5)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 2// Adjust step size for y-axis here
+                }
+            }
         }
-    
-        setInterval(changeImage, 5000);  // Change image every 5 seconds
-    </script>
-    
+    }
+    });
+
+    // Top Food Items Chart
+    const foodLabels = topFoodItems.map(item => item.Name);
+    const foodData = topFoodItems.map(item => item.TotalDonations);
+    new Chart(document.getElementById('topFoodItemsChart'), {
+        type: 'pie',
+        data: {
+            labels: foodLabels,
+            datasets: [{
+                data: foodData,
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
+            }]
+        }
+    });
+
+    // Top Locations Chart
+    const locationLabels = topLocations.map(loc => loc.Address);
+    const locationData = topLocations.map(loc => loc.DonationCount);
+    new Chart(document.getElementById('topLocationsChart'), {
+        type: 'bar',
+        data: {
+            labels: locationLabels,
+            datasets: [{
+                label: 'Top Donor Locations',
+                data: locationData,
+                backgroundColor: 'rgba(255, 99, 132, 5)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 2// Adjust step size for y-axis here
+                }
+            }
+        }
+    }
+    }); 
+</script>
 {% endblock javascripts %}
+

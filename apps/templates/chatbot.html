@@ -72,20 +72,17 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Handle form submission via AJAX
         $('#chat-form').on('submit', function(e) {
-            e.preventDefault(); // Prevent the form from submitting normally
+            e.preventDefault();
 
             var query = $('#query').val(); // Get the query from the input field
 
             // Send the query to the Flask route using AJAX
             $.ajax({
-                url: "{{ url_for('chatbot.chat') }}", // Your chatbot route
+                url: "{{ url_for('chatbot.chat') }}",
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    user_id: "12345", // Replace with actual user ID
-                    user_role: "user", // Replace with actual user role
                     query: query
                 }),
                 success: function(data) {

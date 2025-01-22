@@ -2,56 +2,89 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
-
+from flask import render_template, jsonify
 from apps.home import blueprint
-from flask import render_template, request
 from flask_login import login_required
-from jinja2 import TemplateNotFound
+import pymysql
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from the .env file
+load_dotenv()
+
+# Fetch credentials from environment variables
+DB_HOST = os.getenv('DB_HOST')
+DB_USER = os.getenv('DB_USERNAME')
+DB_PASSWORD = os.getenv('DB_PASS')
+DB_NAME = os.getenv('DB_NAME')
 
 
-@blueprint.route('/index')
-@login_required
-def index():
+def get_db_connection():
+    """Establish a connection to the database."""
+    return pymysql.connect(
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        database=DB_NAME,
+        cursorclass=pymysql.cursors.DictCursor
+    )
 
-    return render_template('home/index.html', segment='index')
 
 @blueprint.route('/home', methods=['GET'])
-def home_page():
-    return render_template('home/home.html')
-
-@blueprint.route('/<template>')
 @login_required
-def route_template(template):
-
+def home_page():
+    connection = None
     try:
+        # Establish database connection
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            # Fetch weekly donations for charts
+            cursor.execute("""
+                SELECT WEEK(DonationDate) AS Week,
+                       COUNT(*) AS TotalDonations
+                FROM food
+                WHERE DonationDate >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+                GROUP BY WEEK(DonationDate);
+            """)
+            weekly_donations = cursor.fetchall()
 
-        if not template.endswith('.html'):
-            template += '.html'
+            # Fetch top food items by donation count
+            cursor.execute("""
+                SELECT 
+                    Name, 
+                    COUNT(*) AS TotalDonations
+                FROM food
+                GROUP BY Name
+                ORDER BY TotalDonations DESC
+                LIMIT 5;
+            """)
+            top_food_items = cursor.fetchall()
 
-        # Detect the current page
-        segment = get_segment(request)
+            # Fetch top donor locations by donation count
+            cursor.execute("""
+                SELECT 
+                    Address, 
+                    COUNT(*) AS DonationCount
+                FROM donor
+                GROUP BY Address
+                ORDER BY DonationCount DESC
+                LIMIT 5;
+            """)
+            top_locations = cursor.fetchall()
+    
+        # Pass data to the template
+        return render_template(
+            'home/home.html',
+            weekly_donations=weekly_donations,
+            top_food_items=top_food_items,
+            top_locations=top_locations
+        )
 
-        # Serve the file (if exists) from app/templates/home/FILE.html
-        return render_template("home/" + template, segment=segment)
+    except Exception as e:
+        # Log the error and return an error response
+        print(f"Error fetching data for home page: {str(e)}")
+        return jsonify({"error": "An error occurred while fetching data"}), 500
 
-    except TemplateNotFound:
-        return render_template('home/page-404.html'), 404
-
-    except:
-        return render_template('home/page-500.html'), 500
-
-
-# Helper - Extract current page name from request
-def get_segment(request):
-
-    try:
-
-        segment = request.path.split('/')[-1]
-
-        if segment == '':
-            segment = 'index'
-
-        return segment
-
-    except:
-        return None
+    finally:
+        if connection:
+            connection.close()  # Ensure the connection is closed after use
