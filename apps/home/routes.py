@@ -71,13 +71,24 @@ def home_page():
                 LIMIT 5;
             """)
             top_locations = cursor.fetchall()
-    
+
+            # Fetch monthly volunteer deliveries data (volunteer delivered an order if status is 'Received')
+            cursor.execute("""
+                SELECT MONTH(o.RequestDate) AS Month,
+                       COUNT(DISTINCT o.VolunteerID) AS TotalDeliveries
+                FROM orders o
+                WHERE o.Status = 'Received'
+                GROUP BY MONTH(o.RequestDate);
+            """)
+            monthly_deliveries = cursor.fetchall()
+
         # Pass data to the template
         return render_template(
             'home/home.html',
             weekly_donations=weekly_donations,
             top_food_items=top_food_items,
-            top_locations=top_locations
+            top_locations=top_locations,
+            monthly_deliveries=monthly_deliveries  # Pass the new data to the template
         )
 
     except Exception as e:
