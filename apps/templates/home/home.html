@@ -56,7 +56,7 @@
                                     <div class="card">
                                         <!-- Full screen width image -->
                                         <div class="card-header">
-                                            <img id="food-waste-image" src="{{ url_for('static', filename='assets/images/home') }}" alt="Food Waste Awareness" class="hero-image" />
+                                            <img id="food-waste-image" src="{{ url_for('static', filename='assets/images/home/homepageimg.jpg') }}" alt="Food Waste Awareness" class="hero-image" />
                                         </div>
 
                                         <!-- Scrollable Text Content -->
@@ -110,7 +110,6 @@
 
 {% block javascripts %}
 <script>
-    <!-- Include any custom JS for dynamic features like changing images, sliders, etc. -->
     let images = [
         "{{ url_for('static', filename='assets/images/home/homepageimg.jpg') }}",
         "{{ url_for('static', filename='assets/images/home/homepageimg2.jpg') }}",
@@ -124,10 +123,10 @@
         document.getElementById('food-waste-image').src = images[currentIndex];
     }
 
-    // const weeklyDonations = {{ weekly_donations | tojson }};
-    // const topFoodItems = {{ top_food_items | tojson }};
-    // const topLocations = {{ top_locations | tojson }};
-    // const monthlyDeliveries = {{ monthly_deliveries | tojson }};
+    const weeklyDonations = {{ weekly_donations | tojson }};
+    const topFoodItems = {{ top_food_items | tojson }};
+    const topLocations = {{ top_locations | tojson }};
+    const monthlyDeliveries = {{ monthly_deliveries | tojson }};
 
     // Weekly Donations Chart
     const weeklyLabels = weeklyDonations.map(d => 'Week ' + d.Week);
