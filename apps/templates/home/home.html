@@ -65,7 +65,7 @@
                                     <div class="card">
                                         <!-- Full screen width image -->
                                         <div class="card-header">
-                                            <img id="food-waste-image" src="{{ url_for('static', filename='Imgs/Home_img.jpg') }}" alt="Food Waste Awareness" class="hero-image" />
+                                            <img id="food-waste-image" src="{{ url_for('static', filename='assets/images/home') }}" alt="Food Waste Awareness" class="hero-image" />
                                         </div>
 
                                         <!-- Scrollable Text Content -->
@@ -101,9 +101,9 @@
     <!-- Include any custom JS for dynamic features like changing images, sliders, etc. -->
     <script>
          let images = [
-        "{{ url_for('static', filename='imgs/Home_img.jpg') }}",
-        "{{ url_for('static', filename='imgs/Home_img2.jpg') }}",
-        "{{ url_for('static', filename='imgs/Home_img3.png') }}"
+        "{{ url_for('static', filename='assets/images/home/homepageimg.jpg') }}",
+        "{{ url_for('static', filename='assets/images/home/homepageimg2.jpg') }}",
+        "{{ url_for('static', filename='assets/images/home/homepageimg3.jpg') }}"
     ];
     
         let currentIndex = 0;
