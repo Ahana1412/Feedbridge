@@ -122,6 +122,7 @@
         currentIndex = (currentIndex + 1) % images.length;
         document.getElementById('food-waste-image').src = images[currentIndex];
     }
+    setInterval(changeImage, 5000);  // Change image every 5 seconds
 
     const weeklyDonations = {{ weekly_donations | tojson }};
     const topFoodItems = {{ top_food_items | tojson }};

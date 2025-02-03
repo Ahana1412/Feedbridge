@@ -8,7 +8,8 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL,
     role ENUM('donor', 'food_bank', 'volunteer', 'admin') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    status ENUM('PendingApproval', 'Approved') DEFAULT 'PendingApproval'
 );
 
 CREATE TABLE donor (

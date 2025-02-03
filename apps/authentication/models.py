@@ -29,6 +29,7 @@ class Users(db.Model, UserMixin):
     email         = db.Column(db.String(100), unique=True)
     password      = db.Column('password_hash', db.LargeBinary)
     role          = db.Column(ENUM('donor', 'food_bank', 'volunteer', 'admin'), nullable=False)
+    status        = db.Column(ENUM('PendingApproval', 'Approved'))
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():
@@ -200,6 +201,9 @@ class Food(db.Model):
         "exclude_properties": ["RemainingShelfLife"]
     }
 
+    # Relationship with Donor (optional)
+    # donor = db.relationship('donor', backref='food', lazy=True)
+
     def save(self) -> None:
         try:
             db.session.add(self)
@@ -220,9 +224,6 @@ class Food(db.Model):
             error = str(e.__dict__['orig'])
             raise InvalidUsage(error, 422)
         return
-    
-    # Relationship with Donor (optional)
-    # donor = db.relationship('Donor', backref='food', lazy=True)
 
 
 class Order(db.Model):
