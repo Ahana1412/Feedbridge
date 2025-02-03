@@ -2,13 +2,7 @@
 
 {% block title %} Admin {% endblock %}
 
-{% block stylesheets %}
-<!-- Add any additional stylesheets if required -->
-{% endblock stylesheets %}
-
 {% block content %}
-
-<!-- [ Main Content ] start -->
 <div class="pcoded-main-container">
     <div class="pcoded-wrapper">
         <div class="pcoded-content">
@@ -28,35 +22,42 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="main-body">
                     <div class="page-wrapper">
                         <div class="row">
+                            <!-- Donors Table -->
                             <div class="col-sm-12">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5>New Users</h5>
-                                        <span class="d-block m-t-5">Newly registered users pending admin approval</span>
+                                        <h5>Pending Donors</h5>
                                     </div>
                                     <div class="card-block table-border-style">
                                         <div class="table-responsive">
-                                            <table class="table table-striped" id="user-table">
+                                            <table class="table table-striped">
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Username</th>
                                                         <th>Email</th>
-                                                        <th>Role</th>
+                                                        <th>Donor Name</th>
+                                                        <th>Donor Type</th>
+                                                        <th>Contact No.</th>
+                                                        <th>Address</th>
                                                         <th>Status</th>
-                                                        <th>Action</th> <!-- Added Action Column -->
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {% for user in users %}
+                                                    {% for user in donors %}
                                                     <tr>
                                                         <td>{{ loop.index }}</td>
                                                         <td>{{ user.username }}</td>
                                                         <td>{{ user.email }}</td>
-                                                        <td>{{ user.role }}</td>
+                                                        <td>{{ user.name }}</td>
+                                                        <td>{{ user.donor_type }}</td>
+                                                        <td>{{ user.contact_number }}</td>
+                                                        <td>{{ user.address }}</td>
                                                         <td>{{ user.status }}</td>
                                                         <td>
                                                             <form method="POST" action="{{ url_for('admin_blueprint.approve_user', user_id=user.id) }}">
@@ -71,13 +72,102 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+
+                            <!-- Food Banks Table -->
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Pending Food Banks</h5>
+                                    </div>
+                                    <div class="card-block table-border-style">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Username</th>
+                                                        <th>Email</th>
+                                                        <th>Food Bank Name</th>
+                                                        <th>Contact No.</th>
+                                                        <th>Address</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for user in foodbanks %}
+                                                    <tr>
+                                                        <td>{{ loop.index }}</td>
+                                                        <td>{{ user.username }}</td>
+                                                        <td>{{ user.email }}</td>
+                                                        <td>{{ user.name }}</td>
+                                                        <td>{{ user.contact_number }}</td>
+                                                        <td>{{ user.address }}</td>
+                                                        <td>{{ user.status }}</td>
+                                                        <td>
+                                                            <form method="POST" action="{{ url_for('admin_blueprint.approve_user', user_id=user.id) }}">
+                                                                <button type="submit" class="btn btn-primary">Approve</button>
+                                                            </form>
+                                                        </td>                                                        
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Volunteers Table -->
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Pending Volunteers</h5>
+                                    </div>
+                                    <div class="card-block table-border-style">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Username</th>
+                                                        <th>Email</th>
+                                                        <th>Volunteer Name</th>
+                                                        <th>Contact No.</th>
+                                                        <th>Address</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for user in volunteers %}
+                                                    <tr>
+                                                        <td>{{ loop.index }}</td>
+                                                        <td>{{ user.username }}</td>
+                                                        <td>{{ user.email }}</td>
+                                                        <td>{{ user.first_name }}{{user.last_name }}</td>
+                                                        <td>{{ user.contact_number }}</td>
+                                                        <td>{{ user.address }}</td>
+                                                        <td>{{ user.status }}</td>
+                                                        <td>
+                                                            <form method="POST" action="{{ url_for('admin_blueprint.approve_user', user_id=user.id) }}">
+                                                                <button type="submit" class="btn btn-primary">Approve</button>
+                                                            </form>
+                                                        </td>                                                        
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div> <!-- row -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- [ Main Content ] end -->
-
 {% endblock content %}

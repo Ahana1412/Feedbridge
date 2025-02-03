@@ -124,7 +124,7 @@ class FoodBank(db.Model):
     address = db.Column('Address', db.Text, nullable=False)
     contact_number = db.Column('ContactNo', db.String(15), nullable=False)
 
-    user = db.relationship('Users', backref='foodbank', lazy=True) 
+    user = db.relationship('Users', backref='foodbanks', lazy=True) 
 
     def save(self) -> None:
         try:
