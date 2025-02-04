@@ -11,27 +11,44 @@ from apps.authentication.models import Users, Donor, Food , Order, Volunteer, Fo
 from apps import db
 
 
-
-@blueprint.route('/donors')
+@blueprint.route('/users')
 @login_required
 @role_required('admin')
-def admin_manage_donors():
-    """Admin-specific profile page."""
-    return render_template('admin/donors.html', user=current_user)
+def admin_manage_users():
+    """Admin-specific registered users list page."""
+    try:
+        # Fetch pending users
+        users = Users.query.filter_by(status='Approved').all()
+        
+        # Categorize users based on role
+        donors, volunteers, foodbanks = [], [], []
+        
+        for user in users:
+            if user.role == "donor":
+                donor = Donor.query.filter_by(user_id=user.id).first()
+                if donor:
+                    donors.append({**user.__dict__, **donor.__dict__})
 
-@blueprint.route('/food_banks')
-@login_required
-@role_required('admin')
-def admin_manage_food_banks():
-    """Admin-specific user management page."""
-    return render_template('admin/food_banks.html', user=current_user)
+            elif user.role == "volunteer":
+                volunteer = Volunteer.query.filter_by(user_id=user.id).first()
+                if volunteer:
+                    volunteers.append({**user.__dict__, **volunteer.__dict__})
 
-@blueprint.route('/volunteers')
-@login_required
-@role_required('admin')
-def admin_manage_volunteers():
-    """Admin-specific user management page."""
-    return render_template('admin/volunteers.html', user=current_user)
+            elif user.role == "food_bank":
+                foodbank = FoodBank.query.filter_by(user_id=user.id).first()
+                if foodbank:
+                    foodbanks.append({**user.__dict__, **foodbank.__dict__})
+
+        return render_template('admin/users.html', 
+                               donors=donors, 
+                               volunteers=volunteers, 
+                               foodbanks=foodbanks)
+
+    except Exception as e:
+        print(f"Error fetching new users: {e}")
+        flash('An error occurred while fetching new users.', 'danger')
+        return render_template('home/home.html')
+
 
 @blueprint.route('/orders')
 @login_required

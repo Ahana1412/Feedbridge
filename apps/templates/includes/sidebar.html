@@ -25,7 +25,7 @@
                     </a>
                 </li>
 
-                {% if current_user.role != 'admin' %}
+                {% if current_user.role == 'nonee' %} <!-- hidden for now -->
                     <!-- Profile Link (Common for all roles) -->
                     <li class="nav-item {% if 'profile' in segment %} active {% endif %}">
                         <a href="../home/" class="nav-link">
@@ -116,25 +116,11 @@
                             <span class="pcoded-mtext">Approve New Users</span>
                         </a>
                     </li>
-                    <!-- Donors List Link -->
+                    <!-- All Users List Link -->
                     <li class="nav-item {% if 'donors' in segment %} active {% endif %}">
-                        <a href="{{ url_for('admin_blueprint.admin_manage_donors') }}" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-heart"></i></span>
-                            <span class="pcoded-mtext">Manage Donors</span>
-                        </a>
-                    </li>
-                    <!-- Foodbanks List Link -->
-                    <li class="nav-item {% if 'foodbanks' in segment %} active {% endif %}">
-                        <a href="{{ url_for('admin_blueprint.admin_manage_food_banks') }}" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-heart"></i></span>
-                            <span class="pcoded-mtext">Manage Foodbanks</span>
-                        </a>
-                    </li>
-                    <!-- Volunteers List Link -->
-                    <li class="nav-item {% if 'volunteers' in segment %} active {% endif %}">
-                        <a href="{{ url_for('admin_blueprint.admin_manage_volunteers') }}" class="nav-link">
-                            <span class="pcoded-micon"><i class="feather icon-heart"></i></span>
-                            <span class="pcoded-mtext">Manage Volunteers</span>
+                        <a href="{{ url_for('admin_blueprint.admin_manage_users') }}" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-users"></i></span>
+                            <span class="pcoded-mtext">Registered Users</span>
                         </a>
                     </li>
                 {% endif %}
