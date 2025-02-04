@@ -117,21 +117,16 @@ def delivery_history():
         flash(f"Error retrieving delivery history: {str(e)}", "danger")
         return redirect(url_for('volunteer_blueprint.volunteer_profile'))
 
-
-
-
-
-
 @blueprint.route('/volunteer/assign/<int:order_id>', methods=['POST'])
 @login_required
 @role_required('volunteer')
 def assign_order(order_id):
-    """Assigns an order to the volunteer."""
+    """Assigns an order to the volunteer and sends notifications."""
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
-            # Fetch the VolunteerID for the current user
-            volunteer_query = "SELECT VolunteerID FROM volunteer WHERE UserID = %s"
+            # Fetch the VolunteerID, Name, and Contact for the current user
+            volunteer_query = "SELECT VolunteerID, FirstName, LastName, ContactNo FROM volunteer WHERE UserID = %s"
             cursor.execute(volunteer_query, (current_user.id,))
             volunteer = cursor.fetchone()
 
@@ -140,6 +135,8 @@ def assign_order(order_id):
                 return redirect(url_for('volunteer_blueprint.volunteer_tasks'))
 
             volunteer_id = volunteer['VolunteerID']
+            volunteer_name = f"{volunteer['FirstName']} {volunteer['LastName']}"
+            volunteer_contact = volunteer['ContactNo']
 
             # Update order status and assign the VolunteerID
             update_query = """
@@ -150,13 +147,45 @@ def assign_order(order_id):
             cursor.execute(update_query, (volunteer_id, order_id))
             connection.commit()
 
-           
-        flash("Order successfully assigned to you.", "success")
+            # Fetch the related Food Bank and Donor information
+            details_query = """
+            SELECT 
+                fb.Name AS FoodBankName, fb.ContactNo AS FoodBankContact, fb.UserID AS FoodBankUserID,
+                d.Name AS DonorName, d.ContactNo AS DonorContact, d.UserID AS DonorUserID
+            FROM orders o
+            JOIN foodbank fb ON o.FoodBankID = fb.FoodBankID
+            JOIN food f ON o.FoodID = f.FoodID
+            JOIN donor d ON f.DonorID = d.DonorID
+            WHERE o.OrderID = %s
+            """
+            cursor.execute(details_query, (order_id,))
+            details = cursor.fetchone()
+
+            if not details:
+                flash("Order details could not be found.", "danger")
+                return redirect(url_for('volunteer_blueprint.volunteer_tasks'))
+
+            # Send notification to the Food Bank
+            food_bank_message = (
+                f"Volunteer {volunteer_name} has taken up your delivery task. "
+                f"Contact: {volunteer_contact}"
+            )
+            create_notification(details['FoodBankUserID'], "Volunteer Assigned", food_bank_message)
+
+            # Send notification to the Donor
+            donor_message = (
+                f"Volunteer {volunteer_name} is delivering the food you donated. "
+                f"Contact: {volunteer_contact}"
+            )
+            create_notification(details['DonorUserID'], "Volunteer Assigned", donor_message)
+
+        flash("Order successfully assigned to you, and notifications have been sent.", "success")
         return redirect(url_for('volunteer_blueprint.thank'))
 
     except Exception as e:
         flash(f"Error assigning order: {str(e)}", "danger")
         return redirect(url_for('volunteer_blueprint.volunteer_tasks'))
+
 
 
 
