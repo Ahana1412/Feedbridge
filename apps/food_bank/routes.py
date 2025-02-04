@@ -16,6 +16,8 @@ import pymysql
 import os
 from dotenv import load_dotenv
 from flask import url_for
+from apps.notifications.backend import create_notification
+
 
 load_dotenv()
 # Fetch credentials from the environment file
@@ -92,9 +94,39 @@ def place_order():
             cursor.execute(update_food_query, (food_id,))
             connection.commit()
 
-        # Close the connection
+             # Fetch Donor info (including UserID) for the notification
+            cursor.execute("""
+            SELECT d.Name AS DonorName, d.ContactNo AS DonorContact, d.UserID AS DonorUserID
+            FROM food f
+            JOIN donor d ON f.DonorID = d.DonorID
+            WHERE f.FoodID = %s
+            """, (food_id,))
+            donor = cursor.fetchone()
+
+            # Fetch Food Bank info (including UserID) for the notification
+            cursor.execute("""
+            SELECT fb.Name AS FoodBankName, fb.ContactNo AS FoodBankContact, fb.UserID AS FoodBankUserID
+            FROM foodbank fb
+            JOIN orders o ON fb.FoodBankID = o.FoodBankID
+            WHERE o.FoodID = %s
+            """, (food_id,))
+            food_bank = cursor.fetchone()
+
+            # Create notification for the donor if found
+            if donor:
+                message = f"FoodBank {food_bank['FoodBankName']} is requesting food. Contact: {food_bank['FoodBankContact']}"
+                create_notification(donor['DonorUserID'], "Food Bank Request", message)
+
+            # Create notification for the food bank if found
+            if food_bank:
+                create_notification(food_bank['FoodBankUserID'], "Order Placed", f"A new order has been placed for the food item.")
+
+            # Close the connection
         connection.close()
 
+       
+        
+        
         # Flash success message and redirect to thank-you page
         flash('Order placed successfully!')
         return render_template('food_bank/thank.html')

@@ -12,7 +12,8 @@ from sys import exit
 from apps.config import config_dict
 from apps import create_app, db
 from apps.chatbot.routes import chatbot_blueprint
-# Import the chatbot blueprint
+from apps.notifications.routes import notifications_blueprint
+
 
 import pymysql
 pymysql.install_as_MySQLdb()
@@ -34,6 +35,13 @@ Migrate(app, db)
 
 # Register Chatbot Blueprint
 app.register_blueprint(chatbot_blueprint, url_prefix="/chatbot")  # Prefix routes with /chatbot
+
+# for notification
+app.register_blueprint(notifications_blueprint, url_prefix='/notifications')
+print("Registering Notifications Blueprint")
+
+
+
 
 if not DEBUG:
     Minify(app=app, html=True, js=False, cssless=False)

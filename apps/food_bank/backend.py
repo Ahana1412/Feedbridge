@@ -61,7 +61,7 @@ def fetch_food_items():
 def get_available_food_items():
     """Fetches only available food items from the database."""
     query = """SELECT 
-                    d.Name AS donor_name, 
+                    d.Name AS donor_name,   
                     f.Quantity, 
                     f.FoodType, 
                     f.ItemType, 

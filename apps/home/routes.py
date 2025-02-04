@@ -99,3 +99,5 @@ def home_page():
     finally:
         if connection:
             connection.close()  # Ensure the connection is closed after use
+
+
