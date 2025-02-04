@@ -116,22 +116,6 @@ def admin_manage_donations():
         return render_template('home/home.html')
 
 
-# @blueprint.route('/new_users')
-# @login_required
-# @role_required('admin')
-# def new_pending_users():
-#     """Admin-specific new user approval page."""
-#     try:
-#         # Fetch new pending users
-#         users = Users.query.filter_by(status='PendingApproval').all()
-        
-#         return render_template('admin/approve_users.html', users=users)
-    
-#     except Exception as e:
-#         print(f"Error fetching new users: {e}")
-#         flash('An error occurred while fetching new users.', 'danger')
-#         return render_template('home/home.html')
-
 @blueprint.route('/new_users')
 @login_required
 @role_required('admin')
@@ -196,6 +180,44 @@ def approve_user(user_id):
         print(f"Error approving user: {e}")
         db.session.rollback()  # Rollback in case of failure
         flash("An error occurred while approving the user.", "danger")
-        return render_template('admin/confirm_user_approval.html', 
+        return render_template('admin/approve_users.html', 
+                            msg='There is some glitch. Try again later!',
+                            success=False)
+
+@blueprint.route('/reject_user/<int:user_id>', methods=['POST'])
+@login_required
+@role_required('admin')
+def reject_user(user_id):
+    """Reject and delete a new user."""
+    try:
+        user = Users.query.get(user_id)
+        if not user:
+            flash("User not found.", "danger")
+            return render_template('admin/confirm_user_rejection.html', 
+                            msg='User not found.',
+                            success=False)
+        
+        # Delete role-specific record first
+        if user.role == "donor":
+            Donor.query.filter_by(user_id=user.id).delete()
+        elif user.role == "volunteer":
+            Volunteer.query.filter_by(user_id=user.id).delete()
+        elif user.role == "food_bank":
+            FoodBank.query.filter_by(user_id=user.id).delete()
+        
+        # Delete the user record
+        Users.query.filter_by(id=user.id).delete()
+        db.session.delete(user)
+        db.session.commit()
+        flash("User rejected and removed successfully!", "success")
+        return render_template('admin/confirm_user_rejection.html', 
+                            msg='The user has been rejected successfully!',
+                            success=True)
+    
+    except Exception as e:
+        print(f"Error rejecting user: {e}")
+        db.session.rollback()
+        flash("An error occurred while rejecting the user.", "danger")
+        return render_template('admin/approve_users.html', 
                             msg='There is some glitch. Try again later!',
                             success=False)

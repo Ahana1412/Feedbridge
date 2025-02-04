@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Approval Confirmation Page {% endblock %}
+{% block title %} Rejection Confirmation Page {% endblock %}
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -18,11 +18,11 @@
                             <div class="row align-items-center">
                                 <div class="col-md-12">
                                     <div class="page-header-title">
-                                        <h5 class="m-b-10">User Approval Confirmation</h5>
+                                        <h5 class="m-b-10">User Rejection Confirmation</h5>
                                     </div>
                                     <ul class="breadcrumb">
                                         <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
-                                        <li class="breadcrumb-item"><a href="javascript:">User Approval</a></li>
+                                        <li class="breadcrumb-item"><a href="javascript:">User Rejection</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -38,23 +38,23 @@
                                         <div class="card-header">
                                             <h5>
                                                 {% if success %}
-                                                    User Approved! 
+                                                    User Rejected! 
                                                 {% else %}
-                                                    User Not Approved!
+                                                    User Not Rejected!
                                                 {% endif %}
                                             </h5>
                                         </div>
                                         <div class="card-block">
                                             {% if success %}
                                                 <p>
-                                                    The user has been registered successsfully! 
-                                                    They can login with their credentials and use the platform as needed.
+                                                    The user has been rejected successfully! 
+                                                    The user records have been deleted from all places and they can no longer use this platform.
                                                 </p>
                                                 <a href="{{ url_for('admin_blueprint.new_pending_users')}}" class="btn btn-primary">Check Other Users</a>
                                                 <a href="{{ url_for('home_blueprint.home_page') }}" class="btn btn-primary">Back to Home</a>
                                             {% else %}
                                                 <p>
-                                                    User approval failed due technical glitches. Try again after some time!
+                                                    User Rejection failed due technical glitches. Try again after some time!
                                                 </p>
                                                 <a href="{{ url_for('home_blueprint.home_page') }}" class="btn btn-primary">Back to Home</a>
                                             {% endif %}

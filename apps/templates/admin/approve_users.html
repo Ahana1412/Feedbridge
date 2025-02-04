@@ -60,10 +60,13 @@
                                                         <td>{{ user.address }}</td>
                                                         <td>{{ user.status }}</td>
                                                         <td>
-                                                            <form method="POST" action="{{ url_for('admin_blueprint.approve_user', user_id=user.id) }}">
+                                                            <form method="POST" action="{{ url_for('admin_blueprint.approve_user', user_id=user.id) }}" style="display:inline;">
                                                                 <button type="submit" class="btn btn-primary">Approve</button>
                                                             </form>
-                                                        </td>                                                        
+                                                            <form method="POST" action="{{ url_for('admin_blueprint.reject_user', user_id=user.id) }}" style="display:inline; margin-left:5px;">
+                                                                <button type="submit" class="btn btn-danger">Reject</button>
+                                                            </form>
+                                                        </td>                                                       
                                                     </tr>
                                                     {% endfor %}
                                                 </tbody>
@@ -105,10 +108,13 @@
                                                         <td>{{ user.address }}</td>
                                                         <td>{{ user.status }}</td>
                                                         <td>
-                                                            <form method="POST" action="{{ url_for('admin_blueprint.approve_user', user_id=user.id) }}">
+                                                            <form method="POST" action="{{ url_for('admin_blueprint.approve_user', user_id=user.id) }}" style="display:inline;">
                                                                 <button type="submit" class="btn btn-primary">Approve</button>
                                                             </form>
-                                                        </td>                                                        
+                                                            <form method="POST" action="{{ url_for('admin_blueprint.reject_user', user_id=user.id) }}" style="display:inline; margin-left:5px;">
+                                                                <button type="submit" class="btn btn-danger">Reject</button>
+                                                            </form>
+                                                        </td>                                                       
                                                     </tr>
                                                     {% endfor %}
                                                 </tbody>
@@ -150,8 +156,11 @@
                                                         <td>{{ user.address }}</td>
                                                         <td>{{ user.status }}</td>
                                                         <td>
-                                                            <form method="POST" action="{{ url_for('admin_blueprint.approve_user', user_id=user.id) }}">
+                                                            <form method="POST" action="{{ url_for('admin_blueprint.approve_user', user_id=user.id) }}" style="display:inline;">
                                                                 <button type="submit" class="btn btn-primary">Approve</button>
+                                                            </form>
+                                                            <form method="POST" action="{{ url_for('admin_blueprint.reject_user', user_id=user.id) }}" style="display:inline; margin-left:5px;">
+                                                                <button type="submit" class="btn btn-danger">Reject</button>
                                                             </form>
                                                         </td>                                                        
                                                     </tr>
