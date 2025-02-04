@@ -128,61 +128,6 @@ def detect_food_spoilage(image_bytes):
         return 'error'
 
 
-# @blueprint.route('/new_donation', methods=['GET', 'POST'])
-# @login_required
-# @role_required('donor')
-# def new_donation():
-#     form = DonationForm()
-
-#     if 'new_donation' in request.form:
-#         # Ensure current user is a donor
-#         if current_user.role != 'donor':
-#             return render_template('donor/new_donation.html',
-#                                        msg='Only donors can log donations.',
-#                                        success=False,
-#                                        form=form)
-
-#         # Fetch the donor ID from the donor table
-#         donor = Donor.query.filter_by(user_id=current_user.id).first()
-#         if not donor:
-#             return render_template('donor/new_donation.html',
-#                                        msg='Donor profile not found.',
-#                                        success=False,
-#                                        form=form)
-
-#         # Create a new donation entry
-#         try:
-#             new_donation = Food(
-#                 donor_id=donor.donor_id,
-#                 quantity=form.quantity.data,
-#                 donation_date=datetime.now().date(),
-#                 expiry_date=form.expiry_date.data,
-#                 food_type=form.food_type.data,
-#                 item_type=form.item_type.data,
-#                 food_name=form.food_name.data,
-#                 food_description=form.food_description.data,
-#                 status='Available'
-#             )
-#             db.session.add(new_donation)
-#             db.session.commit()
-#             return render_template('donor/confirmation.html',
-#                                        msg='Donation successfully logged!',
-#                                        success=True,
-#                                        form=form)
-#             # flash('Donation successfully logged!', 'success')
-
-#         except Exception as e:
-#             db.session.rollback()
-#             print(f"Database Error: {e}")
-#             flash('An error occurred while saving the donation.', 'danger')
-
-#     # print("Form submitted:", request.method)
-#     # print("Form valid:", form.validate_on_submit())
-#     # print("Form errors:", form.errors)
-
-#     return render_template('donor/new_donation.html', form=form)
-
-
 @blueprint.route('/donations', methods=['GET'])
 @login_required
 @role_required('donor')

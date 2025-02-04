@@ -47,26 +47,32 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="main-body">
-                    <div class="page-wrapper">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <img id="food-waste-image" src="{{ url_for('static', filename='Imgs/Home_img.jpg') }}" alt="Food Waste Awareness" class="hero-image" />
-                                    </div>
-                                    <div class="content">
-                                        <h5>What is Food Wastage?</h5>
-                                        <p>
-                                            Food wastage is a major global issue that contributes to environmental damage, economic loss, and social inequality. Every year, millions of tons of food are wasted, even though many people around the world struggle with hunger. 
-                                            <br>
-                                            Through our platform, we aim to connect donors, food banks, and volunteers to reduce food waste and ensure that surplus food is directed to those who need it most.
-                                        </p>
-                                        <h5>Our Mission</h5>
-                                        <p>
-                                            Our mission is to create a sustainable and effective system for food waste management by enabling restaurants, grocery stores, and individuals to donate food and make a positive impact on the environment and society.
-                                        </p>
+                    <!-- [ breadcrumb ] end -->
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            <!-- [ Main Content ] start -->
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="card">
+                                        <!-- Full screen width image -->
+                                        <div class="card-header">
+                                            <img id="food-waste-image" src="{{ url_for('static', filename='assets/images/home/homepageimg.jpg') }}" alt="Food Waste Awareness" class="hero-image" />
+                                        </div>
+
+                                        <!-- Scrollable Text Content -->
+                                        <div class="content">
+                                            <h5>What is Food Wastage?</h5>
+                                            <p>
+                                                Food wastage is a major global issue that contributes to environmental damage, economic loss, and social inequality. Every year, millions of tons of food are wasted, even though many people around the world struggle with hunger. 
+                                                <br>
+                                                Through our platform, we aim to connect donors, food banks, and volunteers to reduce food waste and ensure that surplus food is directed to those who need it most.
+                                            </p>
+                                            
+                                            <h5>Our Mission</h5>
+                                            <p>
+                                                Our mission is to create a sustainable and effective system for food waste management by enabling restaurants, grocery stores, and individuals to donate food and make a positive impact on the environment and society.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -104,6 +110,20 @@
 
 {% block javascripts %}
 <script>
+    let images = [
+        "{{ url_for('static', filename='assets/images/home/homepageimg.jpg') }}",
+        "{{ url_for('static', filename='assets/images/home/homepageimg2.jpg') }}",
+        "{{ url_for('static', filename='assets/images/home/homepageimg3.jpg') }}"
+    ];
+    
+    let currentIndex = 0;
+
+    function changeImage() {
+        currentIndex = (currentIndex + 1) % images.length;
+        document.getElementById('food-waste-image').src = images[currentIndex];
+    }
+    setInterval(changeImage, 5000);  // Change image every 5 seconds
+
     const weeklyDonations = {{ weekly_donations | tojson }};
     const topFoodItems = {{ top_food_items | tojson }};
     const topLocations = {{ top_locations | tojson }};

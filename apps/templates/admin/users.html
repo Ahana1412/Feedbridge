@@ -1,0 +1,155 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Admin {% endblock %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="page-header">
+                    <div class="page-block">
+                        <div class="row align-items-center">
+                            <div class="col-md-12">
+                                <div class="page-header-title">
+                                    <h5 class="m-b-10">Registered Users Details</h5>
+                                </div>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                    <li class="breadcrumb-item"><a href="javascript:">Registered Users</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="row">
+                            <!-- Donors Table -->
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Registered Donors</h5>
+                                    </div>
+                                    <div class="card-block table-border-style">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Username</th>
+                                                        <th>Email</th>
+                                                        <th>Donor Name</th>
+                                                        <th>Donor Type</th>
+                                                        <th>Contact No.</th>
+                                                        <th>Address</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for user in donors %}
+                                                    <tr>
+                                                        <td>{{ loop.index }}</td>
+                                                        <td>{{ user.username }}</td>
+                                                        <td>{{ user.email }}</td>
+                                                        <td>{{ user.name }}</td>
+                                                        <td>{{ user.donor_type }}</td>
+                                                        <td>{{ user.contact_number }}</td>
+                                                        <td>{{ user.address }}</td>
+                                                        <td>{{ user.status }}</td>                                                      
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Food Banks Table -->
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Registered Food Banks</h5>
+                                    </div>
+                                    <div class="card-block table-border-style">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Username</th>
+                                                        <th>Email</th>
+                                                        <th>Food Bank Name</th>
+                                                        <th>Contact No.</th>
+                                                        <th>Address</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for user in foodbanks %}
+                                                    <tr>
+                                                        <td>{{ loop.index }}</td>
+                                                        <td>{{ user.username }}</td>
+                                                        <td>{{ user.email }}</td>
+                                                        <td>{{ user.name }}</td>
+                                                        <td>{{ user.contact_number }}</td>
+                                                        <td>{{ user.address }}</td>
+                                                        <td>{{ user.status }}</td>                                                      
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Volunteers Table -->
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Registered Volunteers</h5>
+                                    </div>
+                                    <div class="card-block table-border-style">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Username</th>
+                                                        <th>Email</th>
+                                                        <th>Volunteer Name</th>
+                                                        <th>Contact No.</th>
+                                                        <th>Address</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for user in volunteers %}
+                                                    <tr>
+                                                        <td>{{ loop.index }}</td>
+                                                        <td>{{ user.username }}</td>
+                                                        <td>{{ user.email }}</td>
+                                                        <td>{{ user.first_name }}{{user.last_name }}</td>
+                                                        <td>{{ user.contact_number }}</td>
+                                                        <td>{{ user.address }}</td>
+                                                        <td>{{ user.status }}</td>                                                       
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div> <!-- row -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

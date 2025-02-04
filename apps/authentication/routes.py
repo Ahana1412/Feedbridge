@@ -9,7 +9,6 @@ from flask_login import (
     login_user,
     logout_user
 )
-# from flask_dance.contrib.github import github
 
 
 from apps import db, login_manager
@@ -34,6 +33,12 @@ def login():
         password = request.form['password']
 
         user = Users.find_by_username(user_id) or Users.find_by_email(user_id)
+
+        # Check if new user is approved
+        if user and user.status == 'PendingApproval':
+            # flash("Your account is pending approval. Please wait for admin approval.", "warning")
+            return render_template('accounts/login.html', msg='Your account is pending approval. Please wait for admin approval!', form=login_form)
+
         if user and verify_pass(password, user.password):
             login_user(user)
 
@@ -82,7 +87,7 @@ def register():
                                    form=create_account_form)
 
         # Insert into Users table
-        user = Users(username=username, email=email, password=password, role=role)
+        user = Users(username=username, email=email, password=password, role=role, status='PendingApproval')
         db.session.add(user)
         db.session.flush()  # Get the user's ID for foreign key relationships
         user_id = user.id
@@ -146,16 +151,6 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('authentication_blueprint.login')) 
-
-# @blueprint.route('/food_bank_page')
-# @role_required('food_bank')
-# def food_bank_page():
-#     return render_template('food_bank/food_bank_page.html')
-
-# @blueprint.route('/donor_page')
-# @role_required('donor')
-# def donor_page():
-#     return render_template('donor/donor_page.html')
 
 
 # Errors

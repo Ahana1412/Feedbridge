@@ -13,11 +13,11 @@
                         <div class="row align-items-center">
                             <div class="col-md-12">
                                 <div class="page-header-title">
-                                    <h5 class="m-b-10">Your Donation History</h5>
+                                    <h5 class="m-b-10">Donation History</h5>
                                 </div>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="/home"><i class="feather icon-home"></i></a></li>
-                                    <li class="breadcrumb-item"><a href="javascript:">Donations</a></li>
+                                    <li class="breadcrumb-item"><a href="javascript:">Food Donations</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -29,8 +29,8 @@
                             <div class="col-sm-12">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5>Your Donation History</h5>
-                                        <span class="d-block m-t-5">Details of donations made till date</span>
+                                        <h5>Donation History</h5>
+                                        <span class="d-block m-t-5">Details of all donations made till date</span>
                                     </div>
                                     <div class="card-block table-border-style">
                                         {% if donations %}
@@ -38,8 +38,10 @@
                                                 <table class="table table-striped">
                                                     <thead>
                                                         <tr>
-                                                            <!-- <th>#</th> -->
                                                             <th>Donation ID</th>
+                                                            <th>Donor ID</th>
+                                                            <th>Donor Name</th>
+                                                            <th>Donor Type</th>
                                                             <th>Food Name</th>
                                                             <th>Donation Date</th>
                                                             <th>Expiry Date</th>
@@ -47,20 +49,24 @@
                                                             <th>Item Type</th>
                                                             <th>Description</th>
                                                             <th>Status</th>
+                                                            <th>Donor Contact</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {% for food in donations %}
+                                                        {% for donation in donations %}
                                                         <tr>
-                                                            <!-- <td>{{ loop.index }}</td> -->
-                                                            <td>{{ food.food_id }}</td>
-                                                            <td>{{ food.food_name }}</td>
-                                                            <td>{{ food.donation_date }}</td>
-                                                            <td>{{ food.expiry_date }}</td>
-                                                            <td>{{ food.food_type }}</td>
-                                                            <td>{{ food.item_type }}</td>
-                                                            <td>{{ food.food_description }}</td>
-                                                            <td>{{ food.status }}</td>
+                                                            <td>{{ donation.food_id }}</td>
+                                                            <td>{{ donation.donor_id }}</td>
+                                                            <td>{{ donation.donor_name }}</td>
+                                                            <td>{{ donation.donor_type }}</td>
+                                                            <td>{{ donation.food_name }}</td>
+                                                            <td>{{ donation.donation_date }}</td>
+                                                            <td>{{ donation.expiry_date }}</td>
+                                                            <td>{{ donation.food_type }}</td>
+                                                            <td>{{ donation.item_type }}</td>
+                                                            <td>{{ donation.food_description }}</td>
+                                                            <td>{{ donation.status }}</td>
+                                                            <td>{{ donation.donor_contact }}</td>
                                                         </tr>
                                                         {% endfor %}
                                                     </tbody>
@@ -68,7 +74,7 @@
                                             </div>
                                         {% else %}
                                         <tr>
-                                            <td colspan="11" class="text-center">No donations made yet.</td>
+                                            <td colspan="11" class="text-center">No donations are available.</td>
                                         </tr>
                                         {% endif %}
                                     </div>
