@@ -15,7 +15,7 @@ import pymysql
 import os
 from dotenv import load_dotenv
 from flask import url_for
-
+from apps.notifications.backend import create_notification
 
 load_dotenv()
 # Fetch credentials from the environment file
@@ -150,6 +150,7 @@ def assign_order(order_id):
             cursor.execute(update_query, (volunteer_id, order_id))
             connection.commit()
 
+           
         flash("Order successfully assigned to you.", "success")
         return redirect(url_for('volunteer_blueprint.thank'))
 
