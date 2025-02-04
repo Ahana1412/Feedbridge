@@ -41,39 +41,12 @@ def admin_manage_orders():
     try:
         # Fetch orders made till now
         orders = Order.query.all()
-        
-        return render_template('admin/orders.html', orders=orders)
-    
-    except Exception as e:
-        print(f"Error fetching order history: {e}")
-        flash('An error occurred while fetching order history.', 'danger')
-        return render_template('home/home.html')
-    
-    try:
-        # Step 1: Fetch the donor record
-        donor = Donor.query.filter_by(user_id=current_user.id).first()
-        
-        if not donor:
-            flash('Donor profile not found.', 'danger')
-            return render_template('home/home.html')
-        
-        # Step 2: Fetch food donations by this donor with 'Ordered' status
-        donations = Food.query.filter_by(donor_id=donor.donor_id, status='Ordered').all()
-        
-        if not donations:
-            return render_template('donor/order_history.html', orders=[])
-        
-        # Step 3: Collect all food IDs from these donations
-        food_ids = [donation.food_id for donation in donations]
-        
-        # Step 4: Fetch related orders using these food IDs
-        orders = Order.query.filter(Order.food_id.in_(food_ids)).all()
-        
-        # Step 5: Prepare order details with food, volunteer, and food bank data
+
         order_details = []
         for order in orders:
-            food = next((d for d in donations if d.food_id == order.food_id), None)
+            food = Food.query.filter_by(food_id=order.food_id).first()
             food_bank = FoodBank.query.filter_by(foodbank_id=order.foodbank_id).first()
+            donor = Donor.query.filter_by(donor_id=food.donor_id).first()
             volunteer = Volunteer.query.filter_by(volunteer_id=order.volunteer_id).first() if order.volunteer_id else None
             
             order_details.append({
@@ -85,18 +58,18 @@ def admin_manage_orders():
                 'status': order.status,
                 'foodbank_name': food_bank.name,
                 'foodbank_contact': food_bank.contact_number,
-                # 'foodbank_address': food_bank.address if food_bank else 'N/A',
+                'donor_name': donor.name,
+                'donor_contact': donor.contact_number,
                 'volunteer_name': volunteer.first_name if volunteer else 'Not assigned',
                 'volunteer_contact': volunteer.contact_number if volunteer else 'Not assigned'
             })
         
-        return render_template('donor/order_history.html', orders=order_details)
+        return render_template('admin/orders.html', orders=order_details)
     
     except Exception as e:
         print(f"Error fetching order history: {e}")
         flash('An error occurred while fetching order history.', 'danger')
         return render_template('home/home.html')
-    
 
 
 @blueprint.route('/donations')
@@ -106,9 +79,28 @@ def admin_manage_donations():
     """Admin-specific donor management page."""
     try:
         # Fetch donations made till now
-        donations = Food.query.all()
+        food_items = Food.query.all()
+
+        donation_details = []
+        for food in food_items:
+            donor = Donor.query.filter_by(donor_id=food.donor_id).first()
+            
+            donation_details.append({
+                'food_id': food.food_id,
+                'donor_id': food.donor_id,
+                'donor_name': donor.name,
+                'donor_type': donor.donor_type,
+                'food_name': food.food_name,
+                'food_description': food.food_description,
+                'donation_date': food.donation_date,  
+                'expiry_date': food.expiry_date,
+                'food_type': food.food_type,
+                'item_type': food.item_type,
+                'status': food.status,
+                'donor_contact': donor.contact_number
+            })
         
-        return render_template('admin/donations.html', donations=donations)
+        return render_template('admin/donations.html', donations=donation_details)
     
     except Exception as e:
         print(f"Error fetching donation history: {e}")

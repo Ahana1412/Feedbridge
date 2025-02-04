@@ -41,6 +41,7 @@
                                                             <th>Donation ID</th>
                                                             <th>Donor ID</th>
                                                             <th>Donor Name</th>
+                                                            <th>Donor Type</th>
                                                             <th>Food Name</th>
                                                             <th>Donation Date</th>
                                                             <th>Expiry Date</th>
@@ -48,21 +49,24 @@
                                                             <th>Item Type</th>
                                                             <th>Description</th>
                                                             <th>Status</th>
+                                                            <th>Donor Contact</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {% for food in donations %}
+                                                        {% for donation in donations %}
                                                         <tr>
-                                                            <td>{{ food.food_id }}</td>
-                                                            <td>{{ food.donor_id }}</td>
-                                                            <td>{{ food.donor_name }}</td>
-                                                            <td>{{ food.food_name }}</td>
-                                                            <td>{{ food.donation_date }}</td>
-                                                            <td>{{ food.expiry_date }}</td>
-                                                            <td>{{ food.food_type }}</td>
-                                                            <td>{{ food.item_type }}</td>
-                                                            <td>{{ food.food_description }}</td>
-                                                            <td>{{ food.status }}</td>
+                                                            <td>{{ donation.food_id }}</td>
+                                                            <td>{{ donation.donor_id }}</td>
+                                                            <td>{{ donation.donor_name }}</td>
+                                                            <td>{{ donation.donor_type }}</td>
+                                                            <td>{{ donation.food_name }}</td>
+                                                            <td>{{ donation.donation_date }}</td>
+                                                            <td>{{ donation.expiry_date }}</td>
+                                                            <td>{{ donation.food_type }}</td>
+                                                            <td>{{ donation.item_type }}</td>
+                                                            <td>{{ donation.food_description }}</td>
+                                                            <td>{{ donation.status }}</td>
+                                                            <td>{{ donation.donor_contact }}</td>
                                                         </tr>
                                                         {% endfor %}
                                                     </tbody>
