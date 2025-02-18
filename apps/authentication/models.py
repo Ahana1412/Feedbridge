@@ -234,7 +234,7 @@ class Order(db.Model):
     foodbank_id = db.Column('FoodBankID', db.Integer, db.ForeignKey('foodbank.FoodBankID'), nullable=False)
     volunteer_id = db.Column('VolunteerID', db.Integer, db.ForeignKey('volunteer.VolunteerID'), nullable=False)
     request_date = db.Column('RequestDate', db.Date, nullable=False)
-    status = db.Column('Status', db.Enum('Pending', 'VolunteerAssigned', 'Completed'), nullable=False)
+    status = db.Column('Status', db.Enum('Pending', 'VolunteerAssigned', 'Received'), nullable=False)
 
     def save(self) -> None:
         try:

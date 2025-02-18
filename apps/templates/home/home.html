@@ -15,15 +15,15 @@
             padding: 20px;
             height: 50vh;
             overflow-y: scroll;
-            background-color: #f4f4f4;
+            background-color: #e1dea9;
         }
 
-        .content h5 {
+        .content h4 {
             margin-top: 20px;
         }
 
         .content p {
-            line-height: 1.6;
+            line-height: 2.0;
         }
     </style>
 {% endblock stylesheets %}
@@ -38,7 +38,7 @@
                         <div class="row align-items-center">
                             <div class="col-md-12">
                                 <div class="page-header-title">
-                                    <h5 class="m-b-10">Welcome to the Food Waste Management System</h5>
+                                    <h1 class="m-b-10">Welcome to the Food Waste Management System</h1>
                                 </div>
                                 <ul class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
@@ -61,14 +61,14 @@
 
                                         <!-- Scrollable Text Content -->
                                         <div class="content">
-                                            <h5>What is Food Wastage?</h5>
+                                            <h4>What is Food Wastage?</h4>
                                             <p>
-                                                Food wastage is a major global issue that contributes to environmental damage, economic loss, and social inequality. Every year, millions of tons of food are wasted, even though many people around the world struggle with hunger. 
+                                                Food wastage is a major global issue that contributes to environmental damage, economic loss, and social inequality. Every year, millions of tons of food is wasted, even though many people around the world struggle with hunger. 
                                                 <br>
                                                 Through our platform, we aim to connect donors, food banks, and volunteers to reduce food waste and ensure that surplus food is directed to those who need it most.
                                             </p>
                                             
-                                            <h5>Our Mission</h5>
+                                            <h4>Our Mission</h4>
                                             <p>
                                                 Our mission is to create a sustainable and effective system for food waste management by enabling restaurants, grocery stores, and individuals to donate food and make a positive impact on the environment and society.
                                             </p>
@@ -122,7 +122,7 @@
         currentIndex = (currentIndex + 1) % images.length;
         document.getElementById('food-waste-image').src = images[currentIndex];
     }
-    setInterval(changeImage, 5000);  // Change image every 5 seconds
+    setInterval(changeImage, 3000);  // Change image every 5 seconds
 
     const weeklyDonations = {{ weekly_donations | tojson }};
     const topFoodItems = {{ top_food_items | tojson }};
