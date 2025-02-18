@@ -15,7 +15,6 @@
         <label for="sort-option">Sort By:</label>
         <select id="sort-option" class="form-control" onchange="sortTable()">
             <option value="quantity">Quantity</option>
-            <option value="distance">Distance</option>
             <option value="expiry_date">Expiry Date</option>
         </select>
     </div>
@@ -135,9 +134,6 @@
             if (sortOption === "quantity") {
                 valueA = parseInt(rowA.cells[2].innerText || 0);
                 valueB = parseInt(rowB.cells[2].innerText || 0);
-            } else if (sortOption === "distance") {
-                valueA = parseFloat(rowA.cells[6]?.innerText || 0);
-                valueB = parseFloat(rowB.cells[6]?.innerText || 0);
             } else if (sortOption === "expiry_date") {
                 valueA = new Date(rowA.cells[5].innerText);
                 valueB = new Date(rowB.cells[5].innerText);
