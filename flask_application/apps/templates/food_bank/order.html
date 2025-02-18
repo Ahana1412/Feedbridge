@@ -1,0 +1,175 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} FoodBanks {% endblock %}
+
+{% block stylesheets %}
+<!-- Add any additional stylesheets if required -->
+{% endblock stylesheets %}
+
+{% block content %}
+
+<!-- [ Main Content ] start -->
+<div class="row" style="margin-left: 20%; width: 80%;"> <!-- Adjusted to avoid left-most corner -->
+    <div class="col-sm-12">
+        <!-- Sort By Dropdown -->
+        <label for="sort-option">Sort By:</label>
+        <select id="sort-option" class="form-control" onchange="sortTable()">
+            <option value="quantity">Quantity</option>
+            <option value="expiry_date">Expiry Date</option>
+        </select>
+    </div>
+
+    <!-- Filters for Food Type and Item Type -->
+    <div class="col-sm-5" style="max-width: 250px;">
+        <label for="food-type-filter">Filter by Food Type:</label>
+        <select id="food-type-filter" class="form-control" onchange="filterTable()">
+            <option value="all">All</option>
+            <option value="veg">Veg</option>
+            <option value="nonveg">NonVeg</option>
+        </select>
+    </div>
+
+    <div class="col-sm-6" style="max-width: 250px;">
+        <label for="item-type-filter">Filter by Item Type:</label>
+        <select id="item-type-filter" class="form-control" onchange="filterTable()">
+            <option value="all">All</option>
+            <option value="grocery">Grocery</option>
+            <option value="cooked">Cooked</option>
+        </select>
+    </div>
+</div>
+
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="page-header">
+                    <div class="page-block">
+                        <div class="row align-items-center">
+                            <div class="col-md-12">
+                                <div class="page-header-title">
+                                    <h5 class="m-b-10">Available Donors</h5>
+                                </div>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                    <li class="breadcrumb-item"><a href="javascript:">Food Bank</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Available Donors</h5>
+                                        <span class="d-block m-t-5">Details of restaurants and grocery stores offering food donations</span>
+                                    </div>
+                                    <div class="card-block table-border-style">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped" id="donor-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Name</th>
+                                                        <th>Quantity</th>
+                                                        <th>Food Type</th>
+                                                        <th>Item Type</th>
+                                                        <th>Expiry Date</th>
+                                                        <th>Location</th>
+                                                        <th>Contact</th>
+                                                        <th>Action</th> <!-- Added Action Column -->
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for donor in donors %}
+                                                    <tr>
+                                                        <td>{{ loop.index }}</td>
+                                                        <td>{{ donor.food_name }}</td>
+                                                        <td>{{ donor.Quantity }}</td>
+                                                        <td>{{ donor.FoodType }}</td>
+                                                        <td>{{ donor.ItemType }}</td>
+                                                        <td>{{ donor.ExpiryDate }}</td>
+                                                        <td>{{ donor.donor_address }}</td>
+                                                        <td>{{ donor.donor_contact }}</td>
+                                                        <td>
+                                                            <form action="/food_bank/thank" method="POST"> <!-- Redirects to thank.html -->
+                                                                <input type="hidden" name="food_id" value="{{ donor.FoodID }}"> <!-- Ensure FoodID is passed -->
+                                                                <button type="submit" class="btn btn-primary">Place Order</button>
+                                                            </form>
+                                                                                                                       
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- [ Main Content ] end -->
+
+{% endblock content %}
+
+
+<!-- Specific Page JS -->{% block javascripts %}
+<script>
+    function sortTable() {
+        let sortOption = document.getElementById("sort-option").value;
+        let table = document.getElementById("donor-table");
+        let rows = Array.from(table.rows).slice(1);
+
+        rows.sort((rowA, rowB) => {
+            let valueA, valueB;
+
+            if (sortOption === "quantity") {
+                valueA = parseInt(rowA.cells[2].innerText || 0);
+                valueB = parseInt(rowB.cells[2].innerText || 0);
+            } else if (sortOption === "expiry_date") {
+                valueA = new Date(rowA.cells[5].innerText);
+                valueB = new Date(rowB.cells[5].innerText);
+            }
+
+            return valueA > valueB ? 1 : -1;
+        });
+
+        rows.forEach(row => table.tBodies[0].appendChild(row));
+    }
+
+    function filterTable() {
+        let foodType = document.getElementById("food-type-filter").value.toLowerCase();
+        let itemType = document.getElementById("item-type-filter").value.toLowerCase();
+
+        let table = document.getElementById("donor-table");
+        let rows = table.getElementsByTagName("tr");
+
+        for (let i = 1; i < rows.length; i++) {
+            let foodTypeCell = rows[i].getElementsByTagName("td")[3]?.innerText.toLowerCase().trim();
+            let itemTypeCell = rows[i].getElementsByTagName("td")[4]?.innerText.toLowerCase().trim();
+            let showRow = true;
+
+            // Filter based on food type
+            if (foodType !== "all" && foodType !== foodTypeCell) {
+                showRow = false;
+            }
+            // Filter based on item type
+            if (itemType !== "all" && itemType !== itemTypeCell) {
+                showRow = false;
+            }
+
+            // Show or hide row based on filtering
+            rows[i].style.display = showRow ? "" : "none";
+        }
+    }
+</script>
+{% endblock javascripts %}
+

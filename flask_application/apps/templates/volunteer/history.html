@@ -1,0 +1,81 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Delivery History {% endblock %}
+
+{% block content %}
+<!-- [ Main Content ] start -->
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="page-header">
+                    <div class="page-block">
+                        <div class="row align-items-center">
+                            <div class="col-md-12">
+                                <div class="page-header-title">
+                                    <h5 class="m-b-10">Delivery History</h5>
+                                </div>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                    <li class="breadcrumb-item"><a href="javascript:">History</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Your Delivery History</h5>
+                                        <span class="d-block m-t-5">Details of the deliveries you have completed</span>
+                                    </div>
+                                    <div class="card-block table-border-style">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Order ID</th>
+                                                        <th>Food Name</th>
+                                                        <th>Donor Name</th>
+                                                        <th>Donor Contact</th>
+                                                        <th>Food Bank Name</th>
+                                                        <th>Food Bank Location</th>
+                                                        <th>Food Bank Contact</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% if deliveries %}
+                                                        {% for delivery in deliveries %}
+                                                            <tr>
+                                                                <td>{{ delivery.OrderID }}</td>
+                                                                <td>{{ delivery.FoodName }}</td>
+                                                                <td>{{ delivery.DonorName }}</td>
+                                                                <td>{{ delivery.DonorContact }}</td>
+                                                                <td>{{ delivery.FoodBankName }}</td>
+                                                                <td>{{ delivery.FoodBankAddress }}</td>
+                                                                <td>{{ delivery.FoodBankContact }}</td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <tr>
+                                                            <td colspan="7" class="text-center">No delivery history found.</td>
+                                                        </tr>
+                                                    {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- [ Main Content ] end -->
+{% endblock %}

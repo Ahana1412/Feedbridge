@@ -1,0 +1,87 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Order History {% endblock %}
+
+{% block content %}
+<!-- [ Main Content ] start -->
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="page-header">
+                    <div class="page-block">
+                        <div class="row align-items-center">
+                            <div class="col-md-12">
+                                <div class="page-header-title">
+                                    <h5 class="m-b-10">Order History</h5>
+                                </div>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/home"><i class="feather icon-home"></i></a></li>
+                                    <li class="breadcrumb-item"><a href="javascript:">Orders</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Your Donation Order History</h5>
+                                        <span class="d-block m-t-5">Details of orders placed by foodbanks</span>
+                                    </div>
+                                    <div class="card-block table-border-style">
+                                        {% if orders %}
+                                            <div class="table-responsive">
+                                                <table class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Order ID</th>
+                                                            <th>Food ID</th>
+                                                            <th>Food Name</th>
+                                                            <th>Description</th>
+                                                            <th>Request Date</th>
+                                                            <th>Status</th>
+                                                            <th>Food Bank Name</th>
+                                                            <th>Food Bank Contact</th>
+                                                            <th>Volunteer Name</th>
+                                                            <th>Volunteer Contact</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for order in orders %}
+                                                        <tr>
+                                                            <td>{{ order.order_id }}</td>
+                                                            <td>{{ order.food_id }}</td>
+                                                            <td>{{ order.food_name }}</td>
+                                                            <td>{{ order.food_description }}</td>
+                                                            <td>{{ order.request_date }}</td>
+                                                            <td>{{ order.status }}</td>
+                                                            <td>{{ order.foodbank_name }}</td>
+                                                            <td>{{ order.foodbank_contact }}</td>
+                                                            <td>{{ order.volunteer_name or 'Not assigned' }}</td>
+                                                            <td>{{ order.volunteer_contact or 'Not assigned' }}</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="11" class="text-center">No orders placed yet.</td>
+                                        </tr>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- [ Main Content ] end -->
+{% endblock %}

@@ -1,0 +1,121 @@
+<!-- [ Header ] start -->
+<header class="navbar pcoded-header navbar-expand-lg navbar-light">
+    <div class="m-header">
+        <a class="mobile-menu" id="mobile-collapse1" href="javascript:"><span></span></a>
+        <a href="/" class="b-brand">
+            <div class="b-bg">
+                <i class="feather icon-trending-up"></i>
+            </div>
+            <span class="b-title">FeedBridge</span>
+        </a>
+    </div>
+    <a class="mobile-menu" id="mobile-header" href="javascript:">
+        <i class="feather icon-more-horizontal"></i>
+    </a>
+    <div class="collapse navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+            <li><a href="javascript:" class="full-screen" onclick="javascript:toggleFullScreen()"><i
+                    class="feather icon-maximize"></i></a></li>
+            
+            
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li>
+                <label>
+                    <i class="icon feather icon-sun" id="theme-indicator"></i>
+                    <input type="checkbox" id="theme-switch" class="d-none">
+                </label>
+            </li>
+            <li>
+                <div class="dropdown">
+                    <a class="dropdown-toggle" href="javascript:" data-toggle="dropdown" id="notificationDropdown">
+                        <i class="icon feather icon-bell"></i>
+                        <span class="badge badge-pill badge-danger" id="notification-count"></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right notification" id="notification-menu">
+                        <div class="noti-head">
+                            <h6 class="d-inline-block m-b-0">Notifications</h6>
+                            <div class="float-right">
+                                <a href="javascript:" class="m-r-10" onclick="markAllAsRead()">mark as read</a>
+                                <a href="javascript:" onclick="clearAllNotifications()">clear all</a>
+                            </div>
+                        </div>
+                        <ul class="noti-body" id="notification-list">
+                            <!-- Notifications will be dynamically loaded here -->
+                        </ul>
+                        <div class="noti-footer">
+                            <a href="javascript:">show all</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    fetchNotifications();
+                });
+            
+                function fetchNotifications() {
+    fetch('/notifications/get')
+        .then(response => {
+            console.log('Response:', response);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Fetched Notifications:', data.notifications);
+            const notifications = data.notifications;
+            const notificationList = document.getElementById('notification-list');
+            const notificationCount = document.getElementById('notification-count');
+            
+            notificationList.innerHTML = '';
+            let unreadCount = 0;
+
+            notifications.forEach(notification => {
+                if (notification.status === 'unread') unreadCount++;
+
+                const listItem = `
+                    <li class="notification" onclick="markAsRead('${notification._id}')">
+                        <div class="media">
+                            <img class="img-radius" src="/static/assets/images/user/avatar-1.jpg" alt="Notification">
+                            <div class="media-body">
+                                <p><strong>${notification.title}</strong>
+                                <span class="n-time text-muted"><i class="icon feather icon-clock m-r-10"></i>${new Date(notification.timestamp).toLocaleString()}</span></p>
+                                <p>${notification.message}</p>
+                            </div>
+                        </div>
+                    </li>
+                `;
+                notificationList.innerHTML += listItem;
+            });
+
+            notificationCount.textContent = unreadCount > 0 ? unreadCount : '';
+        })
+        .catch(error => console.error('Error fetching notifications:', error));
+}
+
+
+            
+                function markAsRead(notificationId) {
+                    fetch(`/notifications/mark-as-read/${notificationId}`, {
+                        method: 'POST'
+                    }).then(() => fetchNotifications());
+                }
+            
+                function markAllAsRead() {
+                    document.querySelectorAll('#notification-list li').forEach(item => {
+                        const notificationId = item.getAttribute('onclick').match(/'([^']+)'/)[1];
+                        markAsRead(notificationId);
+                    });
+                }
+            
+                function clearAllNotifications() {
+                    fetch('/notifications/clear', {
+                        method: 'POST'
+                    }).then(() => fetchNotifications());
+                }
+            </script>
+        </ul>
+    </div>
+</header>
+
+<!-- [ Header ] end -->

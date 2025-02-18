@@ -1,0 +1,215 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Food Waste Reduction {% endblock %}
+
+{% block stylesheets %}
+   <link rel="stylesheet" href="../static/assets/css/style.css">
+    <style>
+        .hero-image {
+            width: 100%;
+            height: 50vh;
+            object-fit: cover;
+        }
+
+        .content {
+            padding: 20px;
+            height: 50vh;
+            overflow-y: scroll;
+            background-color: #e1dea9;
+        }
+
+        .content h4 {
+            margin-top: 20px;
+        }
+
+        .content p {
+            line-height: 2.0;
+        }
+    </style>
+{% endblock stylesheets %}
+{% block content %}
+
+<div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <div class="page-header">
+                    <div class="page-block">
+                        <div class="row align-items-center">
+                            <div class="col-md-12">
+                                <div class="page-header-title">
+                                    <h1 class="m-b-10">Welcome to the Food Waste Management System</h1>
+                                </div>
+                                <ul class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/"><i class="feather icon-home"></i></a></li>
+                                    <li class="breadcrumb-item"><a href="javascript:">Home</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ breadcrumb ] end -->
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            <!-- [ Main Content ] start -->
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="card">
+                                        <!-- Full screen width image -->
+                                        <div class="card-header">
+                                            <img id="food-waste-image" src="{{ url_for('static', filename='assets/images/home/homepageimg.jpg') }}" alt="Food Waste Awareness" class="hero-image" />
+                                        </div>
+
+                                        <!-- Scrollable Text Content -->
+                                        <div class="content">
+                                            <h4>What is Food Wastage?</h4>
+                                            <p>
+                                                Food wastage is a major global issue that contributes to environmental damage, economic loss, and social inequality. Every year, millions of tons of food is wasted, even though many people around the world struggle with hunger. 
+                                                <br>
+                                                Through our platform, we aim to connect donors, food banks, and volunteers to reduce food waste and ensure that surplus food is directed to those who need it most.
+                                            </p>
+                                            
+                                            <h4>Our Mission</h4>
+                                            <p>
+                                                Our mission is to create a sustainable and effective system for food waste management by enabling restaurants, grocery stores, and individuals to donate food and make a positive impact on the environment and society.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Section -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Weekly Donations</h5>
+                                <canvas id="weeklyDonationsChart"></canvas>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Top Donated Food Items</h5>
+                                <canvas id="topFoodItemsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Top Donor Locations</h5>
+                                <canvas id="topLocationsChart"></canvas>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Monthly Deliveries by Volunteers</h5>
+                                <canvas id="monthlyDeliveriesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+    let images = [
+        "{{ url_for('static', filename='assets/images/home/homepageimg.jpg') }}",
+        "{{ url_for('static', filename='assets/images/home/homepageimg2.jpg') }}",
+        "{{ url_for('static', filename='assets/images/home/homepageimg3.jpg') }}"
+    ];
+    
+    let currentIndex = 0;
+
+    function changeImage() {
+        currentIndex = (currentIndex + 1) % images.length;
+        document.getElementById('food-waste-image').src = images[currentIndex];
+    }
+    setInterval(changeImage, 3000);  // Change image every 5 seconds
+
+    const weeklyDonations = {{ weekly_donations | tojson }};
+    const topFoodItems = {{ top_food_items | tojson }};
+    const topLocations = {{ top_locations | tojson }};
+    const monthlyDeliveries = {{ monthly_deliveries | tojson }};
+
+    // Weekly Donations Chart
+    const weeklyLabels = weeklyDonations.map(d => 'Week ' + d.Week);
+    const weeklyData = weeklyDonations.map(d => d.TotalDonations);
+    new Chart(document.getElementById('weeklyDonationsChart'), {
+        type: 'bar',
+        data: {
+            labels: weeklyLabels,
+            datasets: [{
+                label: 'Weekly Donations',
+                data: weeklyData,
+                backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Monthly Deliveries by Volunteers Chart
+    const monthLabels = monthlyDeliveries.map(d => 'Month ' + d.Month);
+    const monthData = monthlyDeliveries.map(d => d.TotalDeliveries);
+    new Chart(document.getElementById('monthlyDeliveriesChart'), {
+        type: 'bar',
+        data: {
+            labels: monthLabels,
+            datasets: [{
+                label: 'Monthly Deliveries by Volunteers',
+                data: monthData,
+                backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Top Food Items Chart
+    const foodLabels = topFoodItems.map(item => item.Name);
+    const foodData = topFoodItems.map(item => item.TotalDonations);
+    new Chart(document.getElementById('topFoodItemsChart'), {
+        type: 'pie',
+        data: {
+            labels: foodLabels,
+            datasets: [{
+                data: foodData,
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
+            }]
+        }
+    });
+
+    // Top Donor Locations Chart
+    const locationLabels = topLocations.map(loc => loc.Address);
+    const locationData = topLocations.map(loc => loc.DonationCount);
+    new Chart(document.getElementById('topLocationsChart'), {
+        type: 'bar',
+        data: {
+            labels: locationLabels,
+            datasets: [{
+                label: 'Top Donor Locations',
+                data: locationData,
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+{% endblock %}
