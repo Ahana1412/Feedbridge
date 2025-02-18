@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, Blueprint
+from flask import render_template, request, flash
 from flask_login import login_required, current_user
 from apps.donor import blueprint
 from apps.authentication.util import role_required
@@ -7,7 +7,6 @@ from flask_login import login_required, current_user
 from apps import db
 from apps.donor.forms import DonationForm
 from datetime import datetime
-from flask import current_app
 from io import BytesIO
 from PIL import Image
 import numpy as np
@@ -259,11 +258,3 @@ def order_history():
         flash('An error occurred while fetching order history.', 'danger')
         return render_template('home/home.html')
     
-
-# @blueprint.route('/test_mongo', methods=['POST', 'GET'])
-# def test_mongo():
-#     mongo_db = current_app.config['mongo_db']
-#     if mongo_db:
-#         mongo_db.notifications.insert_one({"message": "MongoDB connection works!"})
-#         return "MongoDB Test Successful"
-#     return "MongoDB Not Configured Properly"

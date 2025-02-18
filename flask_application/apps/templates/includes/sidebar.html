@@ -28,7 +28,7 @@
                 {% if current_user.role != 'admin' %}
                 <!-- Profile Link (Common for all roles) -->
                 <li class="nav-item {% if 'profile' in segment %} active {% endif %}">
-                    <a href="{{ url_for('home_blueprint.home_page') }}" class="nav-link">
+                    <a href="{{ url_for('profile_blueprint.user_profile') }}" class="nav-link">
                         <span class="pcoded-micon"><i class="feather icon-user"></i></span>
                         <span class="pcoded-mtext">Profile</span>
                     </a>
