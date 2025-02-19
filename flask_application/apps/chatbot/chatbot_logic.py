@@ -20,26 +20,28 @@ knowledge_base = {
     "profile_update": "You can update your personal details by visiting the 'Profile' page on the app.",
     "volunteer_history": "Volunteers can check their delivery history on the 'History' page.",
     "volunteer_delivery": "To know where to deliver, visit your 'History' page to see the food bank and donor address and contact details.",
-    "foodbank_contact": "Food banks can find donor information, addresses, and contact details on their 'Orders History' page.",
-    "donor_contact": "Donors can track volunteer and food bank details in the 'History' section after placing a donation.",
+    "foodbank_contact": "You can find donor information, addresses, and contact details on their 'Orders History' page.",
+    "donor_contact": "You can track volunteer and donor/food bank details in the 'History' section. You can also check the notifications",
+    "foodbank_history": "You can check your order history and other donor/volunteer and food details on the 'History' page.",
     "default": "I'm sorry, I didn't understand that. Could you please rephrase your question or ask about donating, ordering, volunteering, or profile updates?"
 }
 
 
 # Define intents and associated keywords
 intents = {
-    "donate_food": ["donate food", "how to donate", "food donation", "donate", "fruits", "vegetables", "give food", "can I donate", "where to donate"],
-    "order_food": ["order food", "order", "food banks", "ordering for food banks", "receive"],
-    "volunteer": ["volunteer", "help out", "get involved", "sign up"],
-    "donation_items": ["what can I donate", "items to donate", "acceptable donations", "donations", "list to donate", "what to donate"],
-    "how_to_help": ["how can I help", "help options", "ways to help", "what to do"],
+    "donate_food": ["donate food", "how to donate food", "food donation", "fruits", "vegetables", "give food", "can I donate", "where to donate"],
+    "order_food": ["order food", "order items", "food banks", "ordering for food banks", "receive"],
+    "volunteer": ["deliver food", "help out", "get involved", "sign up as volunteer"],
+    "donation_items": ["what can I donate", "items to donate", "acceptable donations", "what donations can i give", "list to donate", "what food to donate"],
+    "how_to_help": ["how can I help", "help options", "ways to help", "what to do", "What to help with"],
     "general_greeting": ["how are you", "hello", "hi", "hey", "what's up"],
-    "thanking": ["thanks", "thank you", "thank you so much", "okay"],
-    "profile_update": ["update profile", "change details", "edit profile", "change number", "change email"],
+    "thanking": ["thanks", "thank you", "thank you so much", "okay", "bye"],
+    "profile_update": ["update profile", "change details", "edit profile", "change number", "change email", "change name", "can i update profile"],
     "volunteer_history": ["check history", "volunteer history", "my deliveries"],
     "volunteer_delivery": ["where to deliver", "delivery location", "volunteer task location", "pick up location", "where to collect", "where to deliver to"],
-    "foodbank_contact": ["food bank contact", "food bank details", "contact food bank", "donor address"],
-    "donor_contact": ["donor contact", "donor address", "contact donor", "which volunteer", "which foodbank"]
+    "foodbank_contact": ["donor contact", "where is donor address", "donor name", "donor address"],
+    "donor_contact": ["who is volunteer", "who will take up the order", "contact foodbank", "which volunteer", "which foodbank", "who is delivering my order"],
+    "foodbank_history": ["order status", "order history", "Where to check previous orders", "Order information"]
 }
 
 # Function to match user input to an intent
