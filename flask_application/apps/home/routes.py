@@ -75,10 +75,12 @@ def home_page():
             # Fetch monthly volunteer deliveries data (volunteer delivered an order if status is 'Received')
             cursor.execute("""
                 SELECT MONTH(o.RequestDate) AS Month,
-                       COUNT(DISTINCT o.VolunteerID) AS TotalDeliveries
-                FROM orders o
-                WHERE o.Status = 'Received'
-                GROUP BY MONTH(o.RequestDate);
+       COUNT(*) AS TotalDeliveries
+        FROM orders o
+        WHERE o.Status = 'Received'
+        AND o.VolunteerID IS NOT NULL  -- Ensure only valid volunteer deliveries are counted
+        GROUP BY MONTH(o.RequestDate);
+
             """)
             monthly_deliveries = cursor.fetchall()
 
