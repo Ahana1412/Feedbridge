@@ -86,16 +86,27 @@ def user_profile():
 
                     db.session.commit()
                     flash("Profile updated successfully!", "success")
-                    return render_template('profile.html', user=user, form=form, role_data=role_data)
+                    return render_template('profile.html', 
+                                           msg="Profile updated successfully!", 
+                                           status="update_success", 
+                                           form=form, user=user, role_data=role_data)
+                
                 else:
                     flash("No associated role data found. Please contact admin.", "danger")
+                    return render_template('profile.html', 
+                                           msg="An error occurred while updating your profile. Please contact admin!", 
+                                           status="update_failure", 
+                                           form=form, user=user, role_data=role_data)
 
             except Exception as e:
                 db.session.rollback()
                 flash("An error occurred while updating your profile.", "danger")
-                print(str(e))  # Debugging - Check error in logs
+                return render_template('profile.html', 
+                                           msg="An error occurred while updating your profile. Try again later!", 
+                                           status="update_failure", 
+                                           form=form, user=user, role_data=role_data)
 
-    return render_template('profile.html', user=user, form=form, role_data=role_data)
+    return render_template('profile.html', status="no_update", user=user, form=form, role_data=role_data)
 
 
 # @blueprint.route('/edit', methods=['GET', 'POST'])

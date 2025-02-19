@@ -23,73 +23,90 @@
                                             <h5>Edit Info</h5>
                                         </div>
                                         <div class="card-block">
-                                            <div class="row">
-                                                <form role="form" method="post" action="{{ url_for('profile_blueprint.user_profile') }}">
-                                                    {{ form.hidden_tag() }}
-                                                
-                                                    <div class="row">
-                                                        <div class="col-sm-6 mb-4">
-                                                            <label>Username</label>
-                                                            <input class="form-control" readonly value="{{ user.username }}">
+                                            {% if status=="update_success" %}
+                                                <p>
+                                                    Your profile details have been updated successfully!        
+                                                </p>
+                                                <div>
+                                                    <a href="{{ url_for('home_blueprint.home_page') }}" class="btn btn-primary">Back to Home</a>
+                                                </div>
+
+                                            {% elif status=="update_failure" %}
+                                                <p>
+                                                    An error occurred while updating your profile. Please try again later or contact admin for clarification.     
+                                                </p>
+                                                <div>
+                                                    <a href="{{ url_for('home_blueprint.home_page') }}" class="btn btn-primary">Back to Home</a>
+                                                </div>   
+
+                                            {% elif status=="no_update" %}
+                                                <div class="row">
+                                                    <form role="form" method="post" action="{{ url_for('profile_blueprint.user_profile') }}">
+                                                        {{ form.hidden_tag() }}
+                                                    
+                                                        <div class="row">
+                                                            <div class="col-sm-6 mb-4">
+                                                                <label>Username</label>
+                                                                <input class="form-control" readonly value="{{ user.username }}">
+                                                            </div>
+                                                    
+                                                            <div class="col-sm-6 mb-4">
+                                                                {{ form.email.label }}
+                                                                {{ form.email(class="form-control") }}
+                                                            </div>
+                                                    
+                                                            <div class="col-sm-6 mb-4">
+                                                                {{ form.contact_number.label }}
+                                                                {{ form.contact_number(class="form-control") }}
+                                                            </div>
+                                                    
+                                                            <div class="col-sm-6 mb-4">
+                                                                {{ form.address.label }}
+                                                                {{ form.address(class="form-control") }}
+                                                            </div>
+                                                    
+                                                            {% if user.role == "donor" %}
+                                                                <div class="col-sm-6 mb-4">
+                                                                    {{ form.donor_name.label }}
+                                                                    {{ form.donor_name(class="form-control") }}
+                                                                </div>
+                                                                <div class="col-sm-6 mb-4">
+                                                                    {{ form.donor_type.label }}
+                                                                    {{ form.donor_type(class="form-control") }}
+                                                                </div>
+                                                    
+                                                            {% elif user.role == "food_bank" %}
+                                                                <div class="col-sm-6 mb-4">
+                                                                    {{ form.foodbank_name.label }}
+                                                                    {{ form.foodbank_name(class="form-control") }}
+                                                                </div>
+                                                    
+                                                            {% elif user.role == "volunteer" %}
+                                                                <div class="col-sm-6 mb-4">
+                                                                    {{ form.first_name.label }}
+                                                                    {{ form.first_name(class="form-control") }}
+                                                                </div>
+                                                                <div class="col-sm-6 mb-4">
+                                                                    {{ form.last_name.label }}
+                                                                    {{ form.last_name(class="form-control") }}
+                                                                </div>
+                                                                <div class="col-sm-6 mb-4">
+                                                                    {{ form.availability.label }}
+                                                                    {{ form.availability(class="form-control") }}
+                                                                </div>
+                                                                <div class="col-sm-6 mb-4">
+                                                                    {{ form.preferred_location.label }}
+                                                                    {{ form.preferred_location(class="form-control") }}
+                                                                </div>
+                                                            {% endif %}
+                                                    
+                                                            <div class="col-sm-12 mb-4">
+                                                                <button type="submit" name="update" class="btn btn-primary">Update Profile</button>
+                                                            </div>
                                                         </div>
-                                                
-                                                        <div class="col-sm-6 mb-4">
-                                                            {{ form.email.label }}
-                                                            {{ form.email(class="form-control") }}
-                                                        </div>
-                                                
-                                                        <div class="col-sm-6 mb-4">
-                                                            {{ form.contact_number.label }}
-                                                            {{ form.contact_number(class="form-control") }}
-                                                        </div>
-                                                
-                                                        <div class="col-sm-6 mb-4">
-                                                            {{ form.address.label }}
-                                                            {{ form.address(class="form-control") }}
-                                                        </div>
-                                                
-                                                        {% if user.role == "donor" %}
-                                                            <div class="col-sm-6 mb-4">
-                                                                {{ form.donor_name.label }}
-                                                                {{ form.donor_name(class="form-control") }}
-                                                            </div>
-                                                            <div class="col-sm-6 mb-4">
-                                                                {{ form.donor_type.label }}
-                                                                {{ form.donor_type(class="form-control") }}
-                                                            </div>
-                                                
-                                                        {% elif user.role == "food_bank" %}
-                                                            <div class="col-sm-6 mb-4">
-                                                                {{ form.foodbank_name.label }}
-                                                                {{ form.foodbank_name(class="form-control") }}
-                                                            </div>
-                                                
-                                                        {% elif user.role == "volunteer" %}
-                                                            <div class="col-sm-6 mb-4">
-                                                                {{ form.first_name.label }}
-                                                                {{ form.first_name(class="form-control") }}
-                                                            </div>
-                                                            <div class="col-sm-6 mb-4">
-                                                                {{ form.last_name.label }}
-                                                                {{ form.last_name(class="form-control") }}
-                                                            </div>
-                                                            <div class="col-sm-6 mb-4">
-                                                                {{ form.availability.label }}
-                                                                {{ form.availability(class="form-control") }}
-                                                            </div>
-                                                            <div class="col-sm-6 mb-4">
-                                                                {{ form.preferred_location.label }}
-                                                                {{ form.preferred_location(class="form-control") }}
-                                                            </div>
-                                                        {% endif %}
-                                                
-                                                        <div class="col-sm-12 mb-4">
-                                                            <button type="submit" name="update" class="btn btn-primary">Update Profile</button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                                
-                                            </div>
+                                                    </form>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
