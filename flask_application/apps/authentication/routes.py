@@ -13,10 +13,11 @@ from flask_login import (
 
 from apps import db, login_manager
 from apps.authentication import blueprint
-from apps.authentication.forms import LoginForm, CreateAccountForm
+from apps.authentication.forms import LoginForm, CreateAccountForm, ResetPasswordForm
 from apps.authentication.models import Users, Donor, FoodBank, Volunteer
 
-from apps.authentication.util import verify_pass, role_required
+from apps.authentication.util import verify_pass, hash_pass, role_required
+
 
 @blueprint.route('/')
 def route_default():
@@ -44,13 +45,7 @@ def login():
 
             # Redirect based on role
             if user.role == 'donor' or 'food_bank' or 'volunteer' or 'admin':
-                return redirect(url_for('home_blueprint.home_page')) #make common home later
-            '''elif user.role == 'food_bank':
-                return redirect(url_for('food_bank_blueprint.food_bank_profile'))
-            elif user.role == 'volunteer':
-                return redirect(url_for('volunteer_blueprint.volunteer_profile'))
-            elif user.role == 'admin':
-                return redirect(url_for('admin_blueprint.admin_manage_orders'))'''
+                return redirect(url_for('home_blueprint.home_page')) 
         
         return render_template('accounts/login.html', msg='Wrong user or password', form=login_form)
 
@@ -61,11 +56,6 @@ def register():
     create_account_form = CreateAccountForm(request.form)
 
     if 'register' in request.form:
-        # if not create_account_form.validate():  # Check if the form is valid
-        #     return render_template('accounts/register.html',
-        #                            msg='Please fill out all required fields correctly.',
-        #                            success=False,
-        #                            form=create_account_form)
 
         # Common fields for all roles
         username = request.form['username']
@@ -151,6 +141,29 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('authentication_blueprint.login')) 
+
+@blueprint.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    reset_password_form = ResetPasswordForm()
+    if 'reset' in request.form:
+        user_id = request.form['username']
+        new_password = request.form['new_password']
+
+        user = Users.find_by_username(user_id) or Users.find_by_email(user_id)
+
+        # Check if new user is approved
+        if user and user.status == 'PendingApproval':
+            return render_template('accounts/reset_password.html', msg='Your account is pending approval. Please wait for admin approval!', form=reset_password_form)
+
+        else:
+            user.password = hash_pass(new_password)
+            db.session.commit()
+            return render_template('accounts/reset_password.html',
+                               msg='Your password has been reset successfully!',
+                               success=True,
+                               form=reset_password_form)
+        
+    return render_template('accounts/reset_password.html', form=reset_password_form) 
 
 
 # Errors

@@ -74,3 +74,11 @@ class CreateAccountForm(FlaskForm):
     foodbank_name = StringField('Food Bank Name',
                            id='foodbank_name',
                            validators=[DataRequired()])
+    
+class ResetPasswordForm(FlaskForm):
+    username = StringField('Username',
+                         id='username_login',
+                         validators=[DataRequired()])
+    new_password = PasswordField('Password',
+                             id='pwd_login',
+                             validators=[DataRequired()])
