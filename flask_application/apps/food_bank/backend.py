@@ -34,7 +34,7 @@ def fetch_food_items():
             food.Quantity,
             food.FoodType,
             food.ItemType,
-            food.ExpiryDate,
+            food.ExpiryHours,
             donor.Name AS donor_name,
             donor.Address AS donor_address,
             donor.ContactNo AS donor_contact

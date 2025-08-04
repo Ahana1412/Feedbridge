@@ -70,6 +70,17 @@ CREATE TABLE orders (
     FOREIGN KEY (VolunteerID) REFERENCES volunteer(VolunteerID)
 );
 
+CREATE TABLE donation_matches (
+    matchid INT AUTO_INCREMENT PRIMARY KEY,
+    food_id INT,
+    foodbank_id INT,
+    match_prediction BOOLEAN,
+    match_confidence FLOAT,
+    FOREIGN KEY (food_id) REFERENCES food(FoodID),
+    FOREIGN KEY (foodbank_id) REFERENCES foodbank(FoodBankID)
+);
+
+
 -- INSERT INTO users (username, password_hash, email, role) 
 -- VALUES ('donor1', '02345d9e8754a6176fd1f1a74198e05b4ccef4a004ce69d811b9c87d60101b1096bea24b2ffc5422022ae497b3afa25f70d817413ee43614b2817b1ad7c6ded319293f36db3677cfdd9b10ed2a8468b7a1f8e200e11cb7af8b260b691ab0aeed', 'donor@example.com', 'donor');
 -- INSERT INTO users (username, password_hash, email, role) 

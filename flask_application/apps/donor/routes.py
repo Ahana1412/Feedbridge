@@ -2,7 +2,7 @@ from flask import render_template, request, flash
 from flask_login import login_required, current_user
 from apps.donor import blueprint
 from apps.authentication.util import role_required
-from apps.authentication.models import Donor, Food , Order, Volunteer, FoodBank
+from apps.authentication.models import Donor, Food , Order, Volunteer, FoodBank, DonationMatch
 from flask_login import login_required, current_user
 from apps import db
 from apps.donor.forms import DonationForm
@@ -13,6 +13,10 @@ import numpy as np
 import os
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image
+import joblib
+from apps.utils.matcher import predict_match
+from apps.utils.geo_utils import calculate_distance
+
 
 
 @blueprint.route('/profile')
@@ -65,7 +69,7 @@ def new_donation():
                 donor_id=donor.donor_id,
                 quantity=form.quantity.data,
                 donation_date=datetime.now().date(),
-                expiry_date=form.expiry_date.data,
+                expiry_hours=form.expiry_hours.data,
                 food_type=form.food_type.data,
                 item_type=form.item_type.data,
                 food_name=form.food_name.data,
@@ -75,10 +79,35 @@ def new_donation():
             db.session.add(new_donation)
             db.session.commit()
 
-            # Return the success page
+            # Fetch donor location (for distance)
+            donor_lat = donor.latitude
+            donor_lon = donor.longitude
+
+            # Get all foodbanks
+            foodbanks = FoodBank.query.all()
+
+            # For each foodbank, calculate match
+            for fb in foodbanks:
+                distance = calculate_distance(donor_lat, donor_lon, fb.latitude, fb.longitude)
+                
+                prediction, confidence = predict_match(new_donation, fb, distance)
+
+                match = DonationMatch(
+                    food_id=new_donation.food_id,
+                    foodbank_id=fb.foodbank_id,
+                    prediction=prediction,
+                    confidence=confidence
+                )
+                db.session.add(match)
+
+            # Commit all matches at once
+            db.session.commit()
+
+            # Show confirmation to donor
             return render_template('donor/confirmation.html',
-                                   msg='Donation successfully logged!',
-                                   success=True)
+                                msg='Donation successfully logged!',
+                                success=True)
+
 
         except Exception as e:
             db.session.rollback()

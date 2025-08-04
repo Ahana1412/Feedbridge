@@ -50,8 +50,9 @@
                                 {{ form.contact_number(placeholder="Contact Number", class="form-control") }}
                             </div>
                             <div class="input-group mb-3">
-                                {{ form.address(placeholder="Address", class="form-control") }}
+                                <input type="text" id="address" name="address" placeholder="Enter address" class="form-control" autocomplete="off">
                             </div>
+                            <div id="suggestions" class="list-group"></div>
                             <div class="input-group mb-3">
                                 {{ form.role(placeholder="Role", class="form-control", id="role_selector") }}
                             </div>
@@ -72,8 +73,17 @@
                                 <div class="input-group mb-3">
                                     {{ form.foodbank_name(placeholder="Food Bank or NGO Name", class="form-control") }}
                                 </div>
+                                    <div class="input-group mb-3">
+                                    {{ form.capacity(placeholder="Enter your capacity", class="form-control") }}
+                                </div>
+                                <div class="input-group mb-3">
+                                    <div class="form-check">
+                                        {{ form.accepts_non_veg(class="form-check-input") }}
+                                        {{ form.accepts_non_veg.label(class="form-check-label") }}
+                                    </div>
+                                </div>
                             </div>
-                        
+
                             <!-- Volunteer Fields -->
                             <div id="volunteer_fields" style="display: none;">
                                 <div class="input-group mb-3">
@@ -107,5 +117,31 @@
 {% endblock content %}
 
 {% block javascripts %}
-    <script src="{{ url_for('static', filename='assets/js/pages/register.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/pages/register.js') }}"></script>
+
+<script>
+document.getElementById("address").addEventListener("input", function () {
+    let query = this.value;
+    if (query.length < 3) return;
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+            let suggestionsBox = document.getElementById("suggestions");
+            suggestionsBox.innerHTML = "";
+            data.forEach(location => {
+                let item = document.createElement("a");
+                item.className = "list-group-item list-group-item-action";
+                item.textContent = location.display_name;
+                item.href = "#";
+                item.onclick = function () {
+                    document.getElementById("address").value = location.display_name;
+                    suggestionsBox.innerHTML = "";
+                };
+                suggestionsBox.appendChild(item);
+            });
+        });
+});
+</script>
 {% endblock javascripts %}
+

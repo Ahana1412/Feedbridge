@@ -91,6 +91,8 @@ class Donor(db.Model):
     donor_type = db.Column('DonorType', db.Enum('Individual', 'Restaurant', 'GroceryStore', 'Others'), nullable=False)
     contact_number = db.Column('ContactNo', db.String(15), nullable=False)
     address = db.Column('Address', db.Text, nullable=False)
+    latitude = db.Column('latitude',db.Float, nullable=False)
+    longitude = db.Column('longitude', db.Float, nullable=False)
 
     user = db.relationship('Users', backref='donor', lazy=True) # to access email use - donor.user.email 
 
@@ -123,6 +125,10 @@ class FoodBank(db.Model):
     name = db.Column('Name', db.String(100), nullable=False)
     address = db.Column('Address', db.Text, nullable=False)
     contact_number = db.Column('ContactNo', db.String(15), nullable=False)
+    capacity = db.Column('Capacity', db.Integer, nullable=False, default=0)
+    accepts_non_veg = db.Column('AcceptsNonVeg', db.Boolean, nullable=False, default=False)
+    latitude = db.Column('latitude',db.Float, nullable=False)
+    longitude = db.Column('longitude', db.Float, nullable=False)
 
     user = db.relationship('Users', backref='foodbanks', lazy=True) 
 
@@ -147,6 +153,38 @@ class FoodBank(db.Model):
             raise InvalidUsage(error, 422)
         return
 
+class DonationMatch(db.Model):
+    __tablename__ = 'donation_matches'
+
+    id = db.Column('matchid', db.Integer, primary_key=True)
+    food_id = db.Column(db.Integer, db.ForeignKey('food.FoodID'))
+    foodbank_id = db.Column(db.Integer, db.ForeignKey('foodbank.FoodBankID'))
+    prediction = db.Column('match_prediction', db.Boolean, nullable=False)
+    confidence = db.Column('match_confidence', db.Float, nullable=False)
+
+    food = db.relationship('Food', backref='matches')
+    foodbank = db.relationship('FoodBank', backref='matches')
+
+    def save(self) -> None:
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            db.session.close()
+            error = str(e.__dict__['orig'])
+            raise InvalidUsage(error, 422)
+
+    def delete_from_db(self) -> None:
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            db.session.close()
+            error = str(e.__dict__['orig'])
+            raise InvalidUsage(error, 422)
+
 
 class Volunteer(db.Model):
     __tablename__ = 'volunteer'
@@ -158,6 +196,8 @@ class Volunteer(db.Model):
     preferred_location = db.Column('PreferredLocation', db.String(100), nullable=True)
     availability = db.Column(db.Enum('Weekdays', 'Weekends', 'FullTime', 'PartTime'), nullable=False)
     address = db.Column('Address', db.Text, nullable=False)
+    latitude = db.Column('latitude',db.Float, nullable=False)
+    longitude = db.Column('longitude', db.Float, nullable=False)
 
     user = db.relationship('Users', backref='volunteers', lazy=True)
 
@@ -191,7 +231,7 @@ class Food(db.Model):
     food_description = db.Column('Description', db.String(255), nullable=True) 
     quantity = db.Column('Quantity', db.Integer)
     donation_date = db.Column('DonationDate', db.Date, nullable=False)
-    expiry_date = db.Column('ExpiryDate', db.Date, nullable=False)
+    expiry_hours = db.Column('ExpiryHours',db.Integer, nullable=False)
     food_type = db.Column('FoodType', db.Enum('Veg', 'NonVeg'), nullable=False)
     item_type = db.Column('ItemType', db.Enum('Cooked', 'Grocery'), nullable=False)
     status = db.Column('Status', db.Enum('Available', 'Ordered'), nullable=False)  # Will be auto-calculated in MySQL

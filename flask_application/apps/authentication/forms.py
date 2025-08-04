@@ -4,7 +4,7 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SelectField, TextAreaField
+from wtforms import StringField, PasswordField, SelectField, TextAreaField, IntegerField, BooleanField
 from wtforms.validators import Email, DataRequired, Optional, Length
 from wtforms import ValidationError
 
@@ -74,6 +74,11 @@ class CreateAccountForm(FlaskForm):
     foodbank_name = StringField('Food Bank Name',
                            id='foodbank_name',
                            validators=[DataRequired()])
+    capacity = IntegerField('Capacity', 
+                            id= 'capacity', 
+                            validators=[DataRequired()])
+    accepts_non_veg = BooleanField('Accept Non-Veg', 
+                                   id = 'accepts_non_veg' )
     
 class ResetPasswordForm(FlaskForm):
     username = StringField('Username',

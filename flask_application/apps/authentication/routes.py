@@ -18,6 +18,25 @@ from apps.authentication.models import Users, Donor, FoodBank, Volunteer
 
 from apps.authentication.util import verify_pass, hash_pass, role_required
 
+#Helper function for geocoding
+import requests
+
+def geocode_address(address):
+    url = "https://nominatim.openstreetmap.org/search"
+    params = {
+        'q': address,
+        'format': 'json',
+        'limit': 1
+    }
+    headers = {
+        'User-Agent': 'YourAppNameHere'
+    }
+    response = requests.get(url, params=params, headers=headers)
+    data = response.json()
+    if data:
+        return float(data[0]['lat']), float(data[0]['lon'])
+    return None, None
+
 
 @blueprint.route('/')
 def route_default():
@@ -88,25 +107,43 @@ def register():
             donor_type = request.form.get('donor_type')
             contact_number = request.form.get('contact_number')
             address = request.form.get('address')
+            latitude, longitude = geocode_address(address)
 
+            if latitude is None or longitude is None:
+                return render_template('accounts/register.html',
+                           msg='Could not geocode the provided address. Please enter a valid location.',
+                           success=False,
+                           form=create_account_form)
+            
             if not name or not donor_type:
                 return render_template('accounts/register.html',
                                        msg='Please fill out all donor-specific fields.',
                                        success=False,
                                        form=create_account_form)
-            donor = Donor(user_id=user_id, name=name, donor_type=donor_type, contact_number=contact_number, address=address)
+            donor = Donor(user_id=user_id, name=name, donor_type=donor_type, contact_number=contact_number, address=address, latitude=latitude, longitude=longitude)
             db.session.add(donor)
 
         elif role == 'food_bank':
             name = request.form.get('foodbank_name')
             contact_number = request.form.get('contact_number')
             address = request.form.get('address')
+            latitude, longitude = geocode_address(address)
+            capacity=request.form.get('capacity')
+            accepts_non_veg = request.form.get("accepts_non_veg")
+            accepts_non_veg = True if accepts_non_veg in ['y', 'yes', '1', 'on', 'true'] else False
+
+            if latitude is None or longitude is None:
+                return render_template('accounts/register.html',
+                           msg='Could not geocode the provided address. Please enter a valid location.',
+                           success=False,
+                           form=create_account_form)
+
             if not name:
                 return render_template('accounts/register.html',
                                        msg='Please fill out all food bank-specific fields.',
                                        success=False,
                                        form=create_account_form)
-            food_bank = FoodBank(user_id=user_id, name=name, contact_number=contact_number, address=address)
+            food_bank = FoodBank(user_id=user_id, name=name, contact_number=contact_number, address=address, capacity=capacity, accepts_non_veg=accepts_non_veg, latitude=latitude, longitude=longitude)
             db.session.add(food_bank)
 
         elif role == 'volunteer':
@@ -116,13 +153,24 @@ def register():
             availability = request.form.get('availability')
             contact_number = request.form.get('contact_number')
             address = request.form.get('address')
+            latitude, longitude = geocode_address(address)
+            
+            if latitude is None or longitude is None:
+                return render_template('accounts/register.html',
+                           msg='Could not geocode the provided address. Please enter a valid location.',
+                           success=False,
+                           form=create_account_form)
+            
             if not first_name or not last_name:
                 return render_template('accounts/register.html',
                                        msg='Please fill out all volunteer-specific fields.',
                                        success=False,
                                        form=create_account_form)
             volunteer = Volunteer(user_id=user_id, first_name=first_name, last_name=last_name,
-                                  preferred_location=preferred_location, availability=availability, contact_number=contact_number, address=address)
+                                    preferred_location=preferred_location, availability=availability,
+                                    contact_number=contact_number, address=address,
+                                    latitude=latitude, longitude=longitude)
+
             db.session.add(volunteer)
 
         # Commit all changes to the database

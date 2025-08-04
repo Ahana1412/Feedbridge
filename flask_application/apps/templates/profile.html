@@ -80,6 +80,18 @@
                                                                     {{ form.foodbank_name.label }}
                                                                     {{ form.foodbank_name(class="form-control") }}
                                                                 </div>
+
+                                                                <div class="col-sm-6 mb-4">
+                                                                    {{ form.capacity.label }}
+                                                                    {{ form.capacity(class="form-control") }}
+                                                                </div>
+
+                                                                <div class="col-sm-6 mb-4">
+                                                                    <div class="form-check mt-4">
+                                                                        {{ form.accepts_non_veg(class="form-check-input") }}
+                                                                        {{ form.accepts_non_veg.label(class="form-check-label") }}
+                                                                    </div>
+                                                                </div>
                                                     
                                                             {% elif user.role == "volunteer" %}
                                                                 <div class="col-sm-6 mb-4">

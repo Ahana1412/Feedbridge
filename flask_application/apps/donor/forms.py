@@ -16,4 +16,5 @@ class DonationForm(FlaskForm):
         ('Grocery', 'Grocery')
     ], validators=[DataRequired()])
     quantity = IntegerField('Quantity', validators=[DataRequired()])
-    expiry_date = DateField('Expiry Date', format='%Y-%m-%d', validators=[DataRequired()])
+    expiry_hours = IntegerField('Time Until Expiry', validators=[Optional()])
+

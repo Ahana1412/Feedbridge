@@ -71,7 +71,7 @@
                                                     <div class="col-sm-6 mb-4">
                                                         <div class="form-group">
                                                             {{ form.quantity.label(class="form-label") }}
-                                                            {{ form.quantity(class="form-control", placeholder="Enter Quantity (in kg/ no. of plates)") }}
+                                                            {{ form.quantity(class="form-control", placeholder="Enter Quantity (number of servings)") }}
                                                         </div>
                                                     </div>
 
@@ -94,8 +94,8 @@
                                                     <!-- Expiry Date -->
                                                     <div class="col-sm-6 mb-4">
                                                         <div class="form-group">
-                                                            {{ form.expiry_date.label(class="form-label") }}
-                                                            {{ form.expiry_date(class="form-control", placeholder="YYYY-MM-DD") }}
+                                                            {{ form.expiry_hours.label(class="form-label") }}
+                                                            {{ form.expiry_hours(class="form-control", placeholder="Number of hours") }}
                                                         </div>
                                                     </div>
 

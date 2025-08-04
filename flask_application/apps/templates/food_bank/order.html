@@ -15,7 +15,7 @@
         <label for="sort-option">Sort By:</label>
         <select id="sort-option" class="form-control" onchange="sortTable()">
             <option value="quantity">Quantity</option>
-            <option value="expiry_date">Expiry Date</option>
+            <option value="expiry_hours">Expiry Hours</option>
         </select>
     </div>
 
@@ -77,29 +77,53 @@
                                                         <th>Quantity</th>
                                                         <th>Food Type</th>
                                                         <th>Item Type</th>
-                                                        <th>Expiry Date</th>
+                                                        <th>Expiry Hours</th>
                                                         <th>Location</th>
                                                         <th>Contact</th>
                                                         <th>Action</th> <!-- Added Action Column -->
                                                     </tr>
                                                 </thead>
+                                                <!-- Matched Donations Section -->
+                                                <thead><tr><th colspan="9" style="font-size: 18px;">Matched Donations</th></tr></thead>
                                                 <tbody>
-                                                    {% for donor in donors %}
+                                                    {% for donor in matched_donations %}
                                                     <tr>
                                                         <td>{{ loop.index }}</td>
                                                         <td>{{ donor.food_name }}</td>
                                                         <td>{{ donor.Quantity }}</td>
                                                         <td>{{ donor.FoodType }}</td>
                                                         <td>{{ donor.ItemType }}</td>
-                                                        <td>{{ donor.ExpiryDate }}</td>
+                                                        <td>{{ donor.ExpiryHours }}</td>
                                                         <td>{{ donor.donor_address }}</td>
                                                         <td>{{ donor.donor_contact }}</td>
                                                         <td>
-                                                            <form action="/food_bank/thank" method="POST"> <!-- Redirects to thank.html -->
-                                                                <input type="hidden" name="food_id" value="{{ donor.FoodID }}"> <!-- Ensure FoodID is passed -->
-                                                                <button type="submit" class="btn btn-primary">Place Order</button>
+                                                            <form action="/food_bank/thank" method="POST">
+                                                                <input type="hidden" name="food_id" value="{{ donor.FoodID }}">
+                                                                <button type="submit" class="btn btn-success">Place Order</button>
                                                             </form>
-                                                                                                                       
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+
+                                                <!-- Unmatched Donations Section -->
+                                                <thead><tr><th colspan="9" style="font-size: 18px;">Other Available Donations</th></tr></thead>
+                                                <tbody>
+                                                    {% for donor in unmatched_donations %}
+                                                    <tr>
+                                                        <td>{{ loop.index }}</td>
+                                                        <td>{{ donor.food_name }}</td>
+                                                        <td>{{ donor.Quantity }}</td>
+                                                        <td>{{ donor.FoodType }}</td>
+                                                        <td>{{ donor.ItemType }}</td>
+                                                        <td>{{ donor.ExpiryHours }}</td>
+                                                        <td>{{ donor.donor_address }}</td>
+                                                        <td>{{ donor.donor_contact }}</td>
+                                                        <td>
+                                                            <form action="/food_bank/thank" method="POST">
+                                                                <input type="hidden" name="food_id" value="{{ donor.FoodID }}">
+                                                                <button type="submit" class="btn btn-secondary">Place Order</button>
+                                                            </form>
                                                         </td>
                                                     </tr>
                                                     {% endfor %}
@@ -134,7 +158,7 @@
             if (sortOption === "quantity") {
                 valueA = parseInt(rowA.cells[2].innerText || 0);
                 valueB = parseInt(rowB.cells[2].innerText || 0);
-            } else if (sortOption === "expiry_date") {
+            } else if (sortOption === "expiry_hours") {
                 valueA = new Date(rowA.cells[5].innerText);
                 valueB = new Date(rowB.cells[5].innerText);
             }

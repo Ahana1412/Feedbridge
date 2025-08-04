@@ -47,13 +47,52 @@ def food_bank_profile():
 @login_required
 @role_required('food_bank')
 def food_bank_requests():
-    """View and manage food requests."""
+    """View and manage food requests for matched and unmatched donations."""
     try:
-        donors = fetch_food_items()
-        return render_template('food_bank/order.html', user=current_user, donors=donors)
+        user_id = current_user.id
+
+        # Step 1: Get FoodBankID for current user
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT FoodBankID FROM foodbank WHERE UserID = %s", (user_id,))
+            foodbank_row = cursor.fetchone()
+
+            if not foodbank_row:
+                raise Exception("No FoodBank found for the current user.")
+
+            foodbank_id = foodbank_row['FoodBankID']
+
+            # Step 2: Get matched donations (match_prediction = 1)
+            cursor.execute("""
+                SELECT f.FoodID, f.Name AS food_name, f.Quantity, f.FoodType, f.ItemType,
+                       f.ExpiryHours, d.Address AS donor_address, d.ContactNo AS donor_contact
+                FROM donation_matches dm
+                JOIN food f ON dm.food_id = f.FoodID
+                JOIN donor d ON f.DonorID = d.DonorID
+                WHERE dm.foodbank_id = %s AND dm.match_prediction = 1 AND f.Status = 'Available'
+            """, (foodbank_id,))
+            matched_donations = cursor.fetchall()
+
+            # Step 3: Get unmatched donations (match_prediction = 0)
+            cursor.execute("""
+                SELECT f.FoodID, f.Name AS food_name, f.Quantity, f.FoodType, f.ItemType,
+                       f.ExpiryHours, d.Address AS donor_address, d.ContactNo AS donor_contact
+                FROM donation_matches dm
+                JOIN food f ON dm.food_id = f.FoodID
+                JOIN donor d ON f.DonorID = d.DonorID
+                WHERE dm.foodbank_id = %s AND dm.match_prediction = 0 AND f.Status = 'Available'
+            """, (foodbank_id,))
+            unmatched_donations = cursor.fetchall()
+
+        connection.close()
+
+        return render_template('food_bank/order.html',
+                               user=current_user,
+                               matched_donations=matched_donations,
+                               unmatched_donations=unmatched_donations)
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 
 @blueprint.route('/thank', methods=['POST'])
@@ -219,7 +258,3 @@ def change_status(order_id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-
-    
-

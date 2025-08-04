@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, TextAreaField
 from wtforms.validators import Email, DataRequired, Optional, Length
+from wtforms import IntegerField, BooleanField
 
 class ProfileUpdateForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -35,3 +36,5 @@ class ProfileUpdateForm(FlaskForm):
 
     # Food Bank-specific fields
     foodbank_name = StringField('Food Bank Name', validators=[DataRequired(), Length(max=100)])
+    capacity = IntegerField('Capacity', validators=[Optional()])
+    accepts_non_veg = BooleanField('Accepts Non-Veg Food')
